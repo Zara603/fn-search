@@ -1,0 +1,33 @@
+{
+  "name": "svc-email-middleware-production",
+  "profile": "up-deployer",
+  "regions": ["ap-southeast-2"],
+  "environment": {
+    "MID": "100016247",
+    "REDIS_URL": "svc-email-middleware-prod-001.wtwcbs.0001.apse2.cache.amazonaws.com:6379",
+    "RECOMMENDATION": "Newsletter",
+    "CACHE_EXPIRY": "43200",
+    "ANALYTICS_EXPIRY": "864000",
+    "DESKTOP_BUCKET_ID":"5dc0d4b43a9746002c210ad1",
+    "MOBILE_BUCKET_ID":"5dc0d5a73f0e3d004d619810",
+    "APP_ENV": "production",
+    "API_HOST": "api.luxgroup.com"
+  },
+  "error_pages": {
+    "disable": true
+  },
+  "lambda": {
+    "runtime": "nodejs12.x",
+    "vpc": {
+      "subnets": [
+        "subnet-8e1b47f8",
+        "subnet-44d3481d",
+        "subnet-7bde4522"
+      ],
+      "security_groups": [
+          "sg-d20a27b5"
+      ]
+    }
+  }
+}
+
