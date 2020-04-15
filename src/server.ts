@@ -6,13 +6,7 @@ import * as holidayTypeSearchController from "./controllers/holidayTypeSearchCon
 import * as locationAlertController from "./controllers/locationAlertController";
 import * as scriptController from "./controllers/scriptController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
-import { IUser } from "./types";
 
-declare namespace Express {
-  interface Request {
-    user: IUser;
-  }
-}
 
 export default function server(): any {
   const app: express.Application = express();
