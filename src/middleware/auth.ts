@@ -5,7 +5,7 @@ export async function authMiddleware(
   req: Request,
   resp: Response,
   next: Function
-) {
+): Promise<void> {
   const authResponse = await getUser(req.headers);
   if (authResponse.status !== 200) {
     resp.status(authResponse.status);

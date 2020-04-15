@@ -14,7 +14,7 @@ interface IGeocode {
 interface IAlert {
   level: string;
   value: string;
-  geocode: IGeocode
+  geocode: IGeocode;
 }
 
 export interface IAlertObject {
@@ -29,13 +29,13 @@ export interface IProperty {
 }
 
 export interface IProperties {
-  Property: IProperty[]
+  Property: IProperty[];
 }
 
 export interface ISoapResult {
   PartnerKey: string;
   ObjectID: string;
-  Type:string;
+  Type: string;
   Properties: IProperties;
 }
 
@@ -54,4 +54,3 @@ export interface IUser {
   herokuId: string;
   personContactId: string;
 }
-
