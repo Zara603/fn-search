@@ -6,7 +6,7 @@ export async function authMiddleware(
   resp: Response,
   next: Function
 ): Promise<void> {
-  const authResponse = await getUser(req.headers);
+  const authResponse: any = await getUser(req.headers);
   if (authResponse.status !== 200) {
     resp.status(authResponse.status);
     resp.end();
@@ -14,6 +14,37 @@ export async function authMiddleware(
     resp.status(403);
     resp.end();
   } else {
+    console.log(authResponse);
+    req.user = {
+      personContactId: authResponse.user.result.person_contact_id,
+      herokuId: authResponse.user.result.id_member,
+      roles: authResponse.user.roles
+    };
+    next();
+  }
+}
+
+export async function adminMiddleware(
+  req: Request,
+  resp: Response,
+  next: Function
+): Promise<void> {
+  const authResponse: any = await getUser(req.headers);
+  if (authResponse.status !== 200) {
+    resp.status(authResponse.status);
+    resp.end();
+  } else if (
+    !authResponse.user &&
+    !authResponse.user.roles.includes("admin-user")
+  ) {
+    resp.status(403);
+    resp.end();
+  } else {
+    req.user = {
+      personContactId: authResponse.user.result.person_contact_id,
+      herokuId: authResponse.user.result.id_member,
+      roles: authResponse.user.roles
+    };
     next();
   }
 }

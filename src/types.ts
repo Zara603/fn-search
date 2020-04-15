@@ -51,6 +51,7 @@ export interface AuthResponse {
 }
 
 export interface IUser {
-  herokuId: string;
-  personContactId: string;
+  herokuId?: string;
+  personContactId?: string;
+  roles?: string[];
 }

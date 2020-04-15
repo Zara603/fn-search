@@ -3,8 +3,7 @@ import { AuthResponse } from "../types";
 import { logger } from "../lib/logger";
 
 export async function getUser(requestHeaders: any): Promise<AuthResponse> {
-  const url = "https://{process.env.API_BASE_URL}/current_user";
-  // const url = "http://prod-svc-auth.lescapes.com/current_user";
+  const url = `https://${process.env.API_BASE_URL}/current_user`;
   delete requestHeaders.host;
   requestHeaders.origin = "https://{process.env.WEBSITE_BASE_URL}";
   const options = {

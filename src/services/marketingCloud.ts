@@ -19,11 +19,6 @@ const SoapClient = new FuelSoap({
     "https://mckkfx4222l3xk300nzdmzdg55cq.soap.marketingcloudapis.com/Service.asmx"
 });
 
-const user = {
-  herokuId: "40f19812-b1df-47d9-845f-717421cc5f17",
-  personContactId: "0032800000SL1uBAAT"
-};
-
 async function getRequest(
   dataObjectName: string,
   dataObjectFields: string[],
@@ -52,7 +47,8 @@ async function getRequest(
 }
 
 async function createUpdateRequest(
-  locationAlert: IAlertObject
+  locationAlert: IAlertObject,
+  user: IUser
 ): Promise<ISoapResponse> {
   const updateOptions = {
     SaveOptions: [
@@ -189,7 +185,7 @@ function soapObjectKey(dataObjectName): string {
 }
 
 export async function getUserLocationAlerts(): Promise<IAlertObject[]> {
-  const dataObjectName = soapObjectKey("F33B6217-D79C-4281-957A-DD229ECC1475");
+  const dataObjectName = soapObjectKey(process.env.DATA_EXTENSION_KEY);
   const response = await getRequest(
     dataObjectName,
     [
@@ -210,17 +206,22 @@ export async function getUserLocationAlerts(): Promise<IAlertObject[]> {
 }
 
 export async function createUserLocationAlert(
-  locationAlert: IAlertObject
-): void {
-  await createUpdateRequest(locationAlert);
+  locationAlert: IAlertObject,
+  user: IUser
+): Promise<void> {
+  await createUpdateRequest(locationAlert, user);
 }
 
 export async function updateUserLocationAlert(
-  locationAlert: IAlertObject
-): void {
-  await createUpdateRequest(locationAlert);
+  locationAlert: IAlertObject,
+  user: IUser
+): Promise<void> {
+  await createUpdateRequest(locationAlert, user);
 }
 
-export async function deleteUserLocationAlert(id: string): void {
+export async function deleteUserLocationAlert(
+  id: string,
+  user: IUser
+): Promise<void> {
   await deleteRequest(id, user);
 }

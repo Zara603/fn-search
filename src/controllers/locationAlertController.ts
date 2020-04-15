@@ -27,7 +27,7 @@ export async function createAlert(
     return res.end();
   }
   try {
-    await createUserLocationAlert(req.body);
+    await createUserLocationAlert(req.body, req.user);
   } catch (err) {
     logger("error", "Error updating alert", err);
     res.status(500);
@@ -50,7 +50,7 @@ export async function updateAlert(
   }
   req.body.id = req.params.id;
   try {
-    await createUserLocationAlert(req.body);
+    await createUserLocationAlert(req.body, req.user);
   } catch (err) {
     logger("error", "Error updating alert", err);
     res.status(500);
@@ -65,7 +65,7 @@ export async function deleteAlert(
   res: Response
 ): Promise<Response | void> {
   try {
-    await deleteUserLocationAlert(req.params.id);
+    await deleteUserLocationAlert(req.params.id, req.user);
   } catch (err) {
     logger("error", "Error deleting alert", err);
     return res.status(500);
