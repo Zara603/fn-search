@@ -6,7 +6,7 @@
     "disable": true
   },
   "lambda": {
-    "runtime": "nodejs12.10",
+    "runtime": "nodejs12.x",
     "vpc": {
       "subnets": [
         "subnet-8e1b47f8",
