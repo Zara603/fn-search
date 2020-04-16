@@ -5,6 +5,9 @@
   "error_pages": {
     "disable": true
   },
+  "environment": {
+    "APP_ENV": "production"
+  },
   "lambda": {
     "runtime": "nodejs12.x",
     "vpc": {
