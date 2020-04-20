@@ -7,7 +7,6 @@ import * as locationAlertController from "./controllers/locationAlertController"
 import * as scriptController from "./controllers/scriptController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
 
-
 export default function server(): any {
   const app: express.Application = express();
   app.use(bodyParserJson());
