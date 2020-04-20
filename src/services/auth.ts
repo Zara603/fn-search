@@ -5,16 +5,18 @@ import { logger } from "../lib/logger";
 export async function getUser(requestHeaders: any): Promise<AuthResponse> {
   const url = `https://${process.env.API_BASE_URL}/current_user`;
   delete requestHeaders.host;
-  requestHeaders.origin = `https://${process.env.WEBSITE_BASE_URL}`;
+  const headers = {
+    Origin: `https://${process.env.WEBSITE_BASE_URL}`,
+    Cookie: requestHeaders.cookie
+  };
   const options = {
     method: "GET",
-    headers: requestHeaders
+    headers
   };
-  console.log(url, options);
   try {
     const resp = await fetch(url, options);
     if (resp.status !== 200) {
-      logger("error", "AuthResponse", resp);
+      logger("error", "AuthResponse", resp.status);
       return { status: resp.status, user: undefined };
     }
     const authUser = await resp.json();
