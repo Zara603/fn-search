@@ -3,7 +3,7 @@ import { logger } from "./lib/logger";
 import server from "./server";
 
 const appEnv = process.env.APP_ENV || "developement";
-console.log(`appEnv: ${appEnv}`)
+console.log(`appEnv: ${appEnv}`);
 
 if (appEnv !== "production") {
   require("dotenv-safe").config({

@@ -5,11 +5,12 @@ import { logger } from "../lib/logger";
 export async function getUser(requestHeaders: any): Promise<AuthResponse> {
   const url = `https://${process.env.API_BASE_URL}/current_user`;
   delete requestHeaders.host;
-  requestHeaders.origin = "https://{process.env.WEBSITE_BASE_URL}";
+  requestHeaders.origin = `https://${process.env.WEBSITE_BASE_URL}`;
   const options = {
     method: "GET",
     headers: requestHeaders
   };
+  console.log(url, options);
   try {
     const resp = await fetch(url, options);
     if (resp.status !== 200) {
