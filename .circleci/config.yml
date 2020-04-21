@@ -5,7 +5,11 @@ jobs:
       - image: circleci/node:12.10.0
     environment:
       APP_ENV: spec
-      PLAN_JOURNEY_ENABLED: false
+      API_BASE_URL: api.testing.luxgroup.com
+      WEBSITE_BASE_URL: testing.luxgroup.com
+      DATA_EXTENSION_KEY: testing 
+      MARKETING_CLOUD_API_CLIENT_ID: testing
+      MARKETING_CLOUD_API_CLIENT_SECRET: testing
     steps:
       - checkout
 
