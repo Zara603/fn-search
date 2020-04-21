@@ -1,0 +1,34 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:12.10.0
+    environment:
+      APP_ENV: spec
+      API_BASE_URL: api.testing.luxgroup.com
+      WEBSITE_BASE_URL: testing.luxgroup.com
+      DATA_EXTENSION_KEY: testing 
+      MARKETING_CLOUD_API_CLIENT_ID: testing
+      MARKETING_CLOUD_API_CLIENT_SECRET: testing
+    steps:
+      - checkout
+
+      - restore_cache:
+          keys:
+          - v1-dependencies-{{ checksum "package.json" }}
+          - v1-dependencies-
+
+      - run: yarn install
+
+      - save_cache:
+          paths:
+            - node_modules
+          key: v1-dependencies-{{ checksum "package.json" }}
+
+      - run: yarn test
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build
