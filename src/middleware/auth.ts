@@ -14,7 +14,6 @@ export async function authMiddleware(
     resp.status(403);
     resp.end();
   } else {
-    console.log(authResponse);
     req.user = {
       personContactId: authResponse.user.result.person_contact_id,
       herokuId: authResponse.user.result.id_member,
