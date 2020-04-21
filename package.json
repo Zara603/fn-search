@@ -32,6 +32,7 @@
     "@types/chai-http": "^4.2.0",
     "@types/mocha": "^5.2.7",
     "@types/nock": "^11.1.0",
+    "@types/sinon": "^9.0.0",
     "@typescript-eslint/eslint-plugin": "^2.28.0",
     "@typescript-eslint/parser": "^2.28.0",
     "chai": "^4.2.0",
@@ -46,6 +47,8 @@
     "nock": "^11.6.0",
     "nodemon": "^1.19.2",
     "prettier": "^1.18.2",
+    "sinon": "^9.0.2",
+    "sinon-typed": "^0.1.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
   }

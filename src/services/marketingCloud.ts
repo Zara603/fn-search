@@ -136,7 +136,6 @@ async function deleteRequest(id: string, user: IUser): Promise<ISoapResponse> {
           logger("error", "Error deleting alert", err);
           return reject(err);
         }
-        console.log(response.body);
         return resolve(response.body);
       }
     );
