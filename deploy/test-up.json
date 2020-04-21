@@ -8,6 +8,13 @@
   "environment": {
     "APP_ENV": "production"
   },
+  "cors": {
+    "allowed_origins": ["*"],
+    "allowed_methods": ["HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"],
+    "allowed_headers": ["*"],
+    "allow_credentials": true
+    }
+  },
   "lambda": {
     "runtime": "nodejs12.x",
     "vpc": {
