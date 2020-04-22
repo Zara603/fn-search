@@ -13,7 +13,6 @@
     "allowed_methods": ["HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"],
     "allowed_headers": ["*"],
     "allow_credentials": true
-    }
   },
   "lambda": {
     "runtime": "nodejs12.x",

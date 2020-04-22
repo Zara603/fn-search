@@ -10,7 +10,6 @@
     "allowed_methods": ["HEAD", "GET", "POST", "PUT", "PATCH", "DELETE"],
     "allowed_headers": ["*"],
     "allow_credentials": true
-    }
   },
   "environment": {
     "APP_ENV": "production"
