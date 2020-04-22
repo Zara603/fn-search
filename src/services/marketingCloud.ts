@@ -183,7 +183,9 @@ function soapObjectKey(dataObjectName): string {
   return `DataExtensionObject[${dataObjectName}]`;
 }
 
-export async function getUserLocationAlerts(): Promise<IAlertObject[]> {
+export async function getUserLocationAlerts(
+  user: IUser
+): Promise<IAlertObject[]> {
   const dataObjectName = soapObjectKey(process.env.DATA_EXTENSION_KEY);
   const response = await getRequest(
     dataObjectName,
@@ -199,7 +201,7 @@ export async function getUserLocationAlerts(): Promise<IAlertObject[]> {
       "colloquial_area",
       "id"
     ],
-    "40f19812-b1df-47d9-845f-717421cc5f17"
+    user.herokuId || ""
   );
   return buildAlertObject(response.Results);
 }

@@ -11,7 +11,7 @@ export async function getAlerts(
   req: Request,
   res: Response
 ): Promise<Response | void> {
-  const alerts = await getUserLocationAlerts();
+  const alerts = await getUserLocationAlerts(req.user);
   return res.json(alerts);
 }
 
