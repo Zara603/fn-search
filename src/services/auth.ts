@@ -2,12 +2,21 @@ import fetch from "node-fetch";
 import { AuthResponse } from "../types";
 import { logger } from "../lib/logger";
 
+function authorizationToCookie(bearerToken: string) {
+  return `access_token=${bearerToken}`;
+}
+
 export async function getUser(requestHeaders: any): Promise<AuthResponse> {
   const url = `https://${process.env.API_BASE_URL}/current_user`;
   delete requestHeaders.host;
   const headers = {
     Origin: `https://${process.env.WEBSITE_BASE_URL}`,
-    Cookie: requestHeaders.cookie
+    Cookie:
+      requestHeaders.cookie ||
+      authorizationToCookie(
+        requestHeaders.authorization.replace("Bearer ", "")
+      ),
+    Authorization: requestHeaders.authorization
   };
   const options = {
     method: "GET",
