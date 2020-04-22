@@ -2,7 +2,7 @@ import fetch from "node-fetch";
 import { AuthResponse } from "../types";
 import { logger } from "../lib/logger";
 
-function authorizationToCookie(bearerToken: string) {
+function authorizationToCookie(bearerToken: string): string {
   return `access_token=${bearerToken}`;
 }
 
