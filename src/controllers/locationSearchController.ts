@@ -5,7 +5,6 @@ export async function index(
   req: Request,
   res: Response
 ): Promise<Response | void> {
-  console.log(req.query);
   //const location = (req.query.location || "").toLowerCase().replace(/\s+/g, "");
   const location = req.query.location;
   const results = await redis.zrange(location, 0, -1);

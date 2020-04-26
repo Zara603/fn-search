@@ -64,7 +64,6 @@ export async function indexOffers(): Promise<void> {
           );
         }
       } catch (err) {
-        console.log(offer.id_salesforce_external);
         logger("error", "Indexing Error", {
           id_salesforce_external: offer.id_salesforce_external
         });

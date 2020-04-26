@@ -90,7 +90,7 @@ describe('test locationAlertController', () => {
   });
 
   it("get locations returns locations alerts", async () => {
-    soapStub = sinon.stub(m, 'getUserLocationAlerts')
+    soapStub = sinon.stub(m, 'getUserDestinationAlertsSFMC')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .get('/api/search/location-alert')
@@ -114,7 +114,7 @@ describe('test locationAlertController', () => {
   });
 
   it("create location creates locationAlert", async () => {
-    soapStub = sinon.stub(m, 'createUserLocationAlert')
+    soapStub = sinon.stub(m, 'createUserDestinationAlertSFMC')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .post("/api/search/location-alert")

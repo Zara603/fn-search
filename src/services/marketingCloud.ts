@@ -126,7 +126,6 @@ function createDeleteObject(id: string, user: IUser): any {
 
 async function deleteRequest(id: string, user: IUser): Promise<ISoapResponse> {
   const deleteValues = createDeleteObject(id, user);
-  console.log(deleteValues);
   return new Promise((resolve, reject) => {
     SoapClient.delete(
       "DataExtensionObject",
@@ -183,7 +182,7 @@ function soapObjectKey(dataObjectName): string {
   return `DataExtensionObject[${dataObjectName}]`;
 }
 
-export async function getUserLocationAlerts(
+export async function getUserDestinationAlertsSFMC(
   user: IUser
 ): Promise<IAlertObject[]> {
   const dataObjectName = soapObjectKey(process.env.DATA_EXTENSION_KEY);
@@ -206,21 +205,21 @@ export async function getUserLocationAlerts(
   return buildAlertObject(response.Results);
 }
 
-export async function createUserLocationAlert(
+export async function createUserDestinationAlertSFMC(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<void> {
   await createUpdateRequest(locationAlert, user);
 }
 
-export async function updateUserLocationAlert(
+export async function updateUserDestinationAlertSFMC(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<void> {
   await createUpdateRequest(locationAlert, user);
 }
 
-export async function deleteUserLocationAlert(
+export async function deleteUserDestinationAlertSFMC(
   id: string,
   user: IUser
 ): Promise<void> {

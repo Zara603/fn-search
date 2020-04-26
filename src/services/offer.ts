@@ -2,7 +2,6 @@ import fetch from "node-fetch";
 
 export async function getOffers(): Promise<any> {
   const url = `https://${process.env.API_BASE_URL}/api/public-offers`;
-  console.log(url);
   const limit = 25;
   let hasMore = true;
   let page = 1;

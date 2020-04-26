@@ -59,3 +59,9 @@ $ curl -i -X PATCH -d '{"google_result":{"continent":"Oceania","country":"Austra
 $ curl -X DELETE  -H 'Cookie:access_token='"$ACCESS_TOKEN"''  https://${API_BASE_URI}/api/search/location-alert/${ALERT_ID}
 ```
 
+
+## Data Storage
+
+This service attempts to use a Data Extention within SFMC as a source of true and redis as a localized data source
+in order to give users a more reliable and faster recall of thier data. This idea is still a work in progress and will most likely change
+from its current state.

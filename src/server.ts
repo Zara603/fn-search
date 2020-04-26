@@ -17,7 +17,10 @@ export default function server(): any {
 
   app.get("/api/search/holiday-type-search", holidayTypeSearchController.index);
 
-  app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
+  app.get("/api/search/index-offers", 
+    adminMiddleware, 
+    scriptController.index
+  );
 
   app.get(
     "/api/search/location-alert",

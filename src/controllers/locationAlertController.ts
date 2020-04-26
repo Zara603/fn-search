@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import {
-  getUserLocationAlerts,
-  createUserLocationAlert,
-  deleteUserLocationAlert
-} from "../services/marketingCloud";
+  getUserDestinationAlerts,
+  createUserDestinationAlert,
+  updateUserDestinationAlert,
+  deleteUserDestinationAlert
+} from "../models/destinationAlert";
 import schemas from "../schema/locationAlertSchema";
 import { logger } from "../lib/logger";
 
@@ -11,7 +12,7 @@ export async function getAlerts(
   req: Request,
   res: Response
 ): Promise<Response | void> {
-  const alerts = await getUserLocationAlerts(req.user);
+  const alerts = await getUserDestinationAlerts(req.user);
   return res.json(alerts);
 }
 
@@ -27,7 +28,7 @@ export async function createAlert(
     return res.end();
   }
   try {
-    await createUserLocationAlert(req.body, req.user);
+    await createUserDestinationAlert(req.body, req.user);
   } catch (err) {
     logger("error", "Error updating alert", err);
     res.status(500);
@@ -50,7 +51,7 @@ export async function updateAlert(
   }
   req.body.id = req.params.id;
   try {
-    await createUserLocationAlert(req.body, req.user);
+    await updateUserDestinationAlert(req.body, req.user);
   } catch (err) {
     logger("error", "Error updating alert", err);
     res.status(500);
@@ -65,7 +66,7 @@ export async function deleteAlert(
   res: Response
 ): Promise<Response | void> {
   try {
-    await deleteUserLocationAlert(req.params.id, req.user);
+    await deleteUserDestinationAlert(req.params.id, req.user);
   } catch (err) {
     logger("error", "Error deleting alert", err);
     return res.status(500);
