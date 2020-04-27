@@ -5,7 +5,6 @@ export async function index(
   req: Request,
   res: Response
 ): Promise<Response | void> {
-  console.log(req.query);
   const { latitude } = req.query;
   const { longitude } = req.query;
   const radius = req.query.radius || 20;
@@ -23,12 +22,9 @@ export async function index(
   let localData = [];
   for (let i = 0; i < results.length; i++) {
     const result = results[i];
-    console.log(result);
     const id = result[0];
-    console.log(id);
     const data = JSON.parse(await redis.get(id));
     data.distance_from_search = result[1];
-    console.log(data);
     localData = localData.concat(data);
   }
   res.json(localData);

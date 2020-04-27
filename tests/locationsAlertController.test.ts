@@ -6,6 +6,7 @@ import * as  app from "../src/start"
 import {SinonTyped} from 'sinon-typed';
 import * as sinon from "sinon"
 import * as m from "../src/services/marketingCloud"
+import * as r from "../src/models/redisDestinationAlert"
 import * as auth from "../src/services/auth"
 import { user } from "./fixtures/user"
 
@@ -74,6 +75,7 @@ describe('test locationAlertController Auth', () => {
 describe('test locationAlertController', () => {
   let authStub;
   let soapStub;
+  let redisStub;
 
   beforeEach(async () => {
     authStub = sinon.stub(auth, 'getUser');
@@ -84,13 +86,15 @@ describe('test locationAlertController', () => {
     authStub.restore();
     try {
       soapStub.restore();
+      redisStub.restore();
     } catch (err) {
       // sometimes this is not stubbed, dont error if it is not
     }
   });
 
   it("get locations returns locations alerts", async () => {
-    soapStub = sinon.stub(m, 'getUserLocationAlerts')
+    soapStub = sinon.stub(m, 'getUserDestinationAlertsSFMC')
+    redisStub = sinon.stub(r, 'getUserDestinationAlertsRedis')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .get('/api/search/location-alert')
@@ -114,7 +118,8 @@ describe('test locationAlertController', () => {
   });
 
   it("create location creates locationAlert", async () => {
-    soapStub = sinon.stub(m, 'createUserLocationAlert')
+    soapStub = sinon.stub(m, 'createUserDestinationAlertSFMC')
+    redisStub = sinon.stub(r, 'createUserDestinationAlertRedis')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .post("/api/search/location-alert")
