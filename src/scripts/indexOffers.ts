@@ -1,18 +1,15 @@
 import { getOffers } from "../services/offer";
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
-import { getAllHashes } from "../lib/redisFunctions";
+import { getAllHashes, stringsToKeys } from "../lib/redisFunctions";
 
 async function cleanUpOldOffers(newOfferIds: string[]): Promise<string[]> {
-  console.log(newOfferIds);
   const allOfferKeys = await redis.keys(`offer:*`);
   const allOffers = await getAllHashes(allOfferKeys);
-  console.log(allOffers);
 
   const oldOffers = allOffers.filter(
     offer => !newOfferIds.includes(offer.id_salesforce_external)
   );
-  console.log("old offers", oldOffers);
   for (let i; i < oldOffers.length; i++) {
     const offerId = oldOffers[i];
     await removeOfferFromRedis(offerId.id_salesforce_external);
@@ -20,14 +17,9 @@ async function cleanUpOldOffers(newOfferIds: string[]): Promise<string[]> {
   return oldOffers.map(offer => offer.id_salesforce_external);
 }
 
-function stringsToKeys(value: string): string {
-  return value.toLowerCase().replace(/\s+/g, "");
-}
-
 async function removeOfferFromRedis(offerId: string): Promise<void> {
   const offer = redis.hgetall(`offer:${offerId}`);
   if (offer) {
-    console.log(offer);
     await redis.zrem(`locations:world`, offerId);
     await redis.zrem(
       `locations:continent:${stringsToKeys(offer.continent)}`,

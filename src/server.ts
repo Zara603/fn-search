@@ -1,8 +1,7 @@
 import * as express from "express";
 import { json as bodyParserJson } from "body-parser";
 import * as geoSearchController from "./controllers/geoSearchController";
-import * as locationSearchController from "./controllers/locationSearchController";
-import * as holidayTypeSearchController from "./controllers/holidayTypeSearchController";
+import * as offerSearchController from "./controllers/offerSearchController";
 import * as locationAlertController from "./controllers/locationAlertController";
 import * as scriptController from "./controllers/scriptController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
@@ -13,9 +12,7 @@ export default function server(): any {
 
   app.get("/api/search/geo-search", geoSearchController.index);
 
-  app.get("/api/search/location-search", locationSearchController.index);
-
-  app.get("/api/search/holiday-type-search", holidayTypeSearchController.index);
+  app.get("/api/search/offer-search", offerSearchController.index);
 
   app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
 

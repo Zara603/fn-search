@@ -60,15 +60,43 @@ $ curl -i -X PATCH -d '{"google_result":{"continent":"Oceania","country":"Austra
 $ curl -X DELETE  -H 'Cookie:access_token='"$ACCESS_TOKEN"''  https://${API_BASE_URI}/api/search/location-alert/${ALERT_ID}
 ```
 
+## Searching for offers
+
+Offers can be searched for using two methods, geo bounds box or using a search term
+
+### Geo Bounds Box search
+
+To search in a radis of a given `lat` and `lng`, eg: lat=0.00 lng=0.00 (the equator on the greenwich meridian line)
+
+The query param `radius` denotes a radius from the central point in KM, default radius is 20KM.
+
+```
+$ curl https://${API_BASE_URI}/api/search/geo-search?lat=0.00&lng=0.00&radius=1000
+```  
+
+### Search using a search term
+
+Search terms do not have to be full words in order to match `aus` will match `Australia`, `Austria` and all other words that contain `aus`.
+
+Search terms are case insensitive, all whitespace is removed during search.
+
+The search is performed against the holidayTypes, admin set locations array, Geo country, continent and administrative_area_level_1 data.
+
+```
+$ curl https://${API_BASE_URI}/api/search/offer-search?search=aus
+```  
 
 ##Redis Keys
 
 All redis keys currently have a prefix that helps with identifying the object, keys are as follows:
 
   - offer:{id_salesforce_external} == key used for offer.
-  - location-world == key used in sorted set into which all the offers are indexed with their lat and lng.
-  - location:continent:{continent_name} == key used in sorted set for which offers are saved against the continent they are found in. 
-  - location:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
+  - locations:world == key used in sorted set into which all the offers are indexed with their lat and lng.
+  - locations:continent:{continent_name} == key used in sorted set for which offers are saved against the continent they are found in. 
+  - locations:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
+  - locations:name:{name} == key used in sorted set for which offers are saved against the admin given locations. 
+  - locations:holidayType:{holidayType} == key used in sorted set for which offers have a certain holidayType. 
+  - locations:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
   - destinationAlerts:{user.UUID} == key used to store a list of destination alert for that user. 
   - alert:{alert.UUID} == key used to store a hash of a destination alert. 
 
