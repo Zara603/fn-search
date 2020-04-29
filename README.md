@@ -39,6 +39,7 @@ $ curl -i https://${API_BASE_URI}/api/search/index-offers -H 'Authorization: Bea
 ```
 
 This command will get all offers listed in public offer and index the searchable data into REDIS.
+It will also clean up all offers that are no longer found within the public-offers API.
 
 ## Creating a user Destination Alert:
 
@@ -59,6 +60,17 @@ $ curl -i -X PATCH -d '{"google_result":{"continent":"Oceania","country":"Austra
 $ curl -X DELETE  -H 'Cookie:access_token='"$ACCESS_TOKEN"''  https://${API_BASE_URI}/api/search/location-alert/${ALERT_ID}
 ```
 
+
+##Redis Keys
+
+All redis keys currently have a prefix that helps with identifying the object, keys are as follows:
+
+  - offer:{id_salesforce_external} == key used for offer.
+  - location-world == key used in sorted set into which all the offers are indexed with their lat and lng.
+  - location:continent:{continent_name} == key used in sorted set for which offers are saved against the continent they are found in. 
+  - location:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
+  - destinationAlerts:{user.UUID} == key used to store a list of destination alert for that user. 
+  - alert:{alert.UUID} == key used to store a hash of a destination alert. 
 
 ## Data Storage
 

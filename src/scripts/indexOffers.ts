@@ -1,9 +1,78 @@
 import { getOffers } from "../services/offer";
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
+import { getAllHashes } from "../lib/redisFunctions";
 
-export async function indexOffers(): Promise<void> {
+async function cleanUpOldOffers(newOfferIds: string[]): Promise<string[]> {
+  console.log(newOfferIds);
+  const allOfferKeys = await redis.keys(`offer:*`);
+  const allOffers = await getAllHashes(allOfferKeys);
+  console.log(allOffers);
+
+  const oldOffers = allOffers.filter(
+    offer => !newOfferIds.includes(offer.id_salesforce_external)
+  );
+  console.log("old offers", oldOffers);
+  for (let i; i < oldOffers.length; i++) {
+    const offerId = oldOffers[i];
+    await removeOfferFromRedis(offerId.id_salesforce_external);
+  }
+  return oldOffers.map(offer => offer.id_salesforce_external);
+}
+
+function stringsToKeys(value: string): string {
+  return value.toLowerCase().replace(/\s+/g, "");
+}
+
+async function removeOfferFromRedis(offerId: string): Promise<void> {
+  const offer = redis.hgetall(`offer:${offerId}`);
+  if (offer) {
+    console.log(offer);
+    await redis.zrem(`locations:world`, offerId);
+    await redis.zrem(
+      `locations:continent:${stringsToKeys(offer.continent)}`,
+      offerId
+    );
+    await redis.zrem(
+      `locations:country:${stringsToKeys(offer.country)}`,
+      offerId
+    );
+    await redis.zrem(
+      `locations:admin-level1:${stringsToKeys(
+        offer.administrative_area_level_1
+      )}`,
+      offerId
+    );
+    for (let j = 0; j < offer.holiday_types.length; j++) {
+      const holidayType = offer.holiday_types[j];
+      await redis.zrem(
+        `locations:holidayType:${stringsToKeys(holidayType)}`,
+        offerId
+      );
+    }
+    for (let j = 0; j < offer.locations.length; j++) {
+      const location = offer.locations[j];
+      await redis.zrem(
+        `locations:holidayType:${stringsToKeys(location)}`,
+        offerId
+      );
+    }
+  }
+}
+
+export async function indexOffers(): Promise<any> {
   const offers = await getOffers();
+  const newOfferIds = offers.map(offer => offer.id_salesforce_external);
+  let cleanedUpOffers: any;
+  const offersUnableToIndex: string[] = [];
+  const indexedOffers: string[] = [];
+  try {
+    cleanedUpOffers = await cleanUpOldOffers(newOfferIds);
+  } catch (err) {
+    logger("error", "error cleaning up offers from redis", err);
+    err.message = `Error cleaning up old offers from redis ${err.message}`;
+    throw err;
+  }
   logger("info", `Indexing ${offers.length} offers`);
   for (let i = 0; i < offers.length; i++) {
     const offer = offers[i];
@@ -15,40 +84,48 @@ export async function indexOffers(): Promise<void> {
 
         const data = {
           locations: offer.locations,
+          holidayTypes: offer.holidayTypes,
           name: offer.name,
           slug: offer.slug,
           id_salesforce_external: offer.id_salesforce_external,
+          lat: latitude,
+          lng: longitude,
+          continent: geoData.continent_code,
+          country: geoData.country,
+          administrative_area_level_1: geoData.administrative_area_level_1,
           url: `https://${process.env.WEBSITE_BASE_URL}/${offer.slug}/${offer.id_salesforce_external}`
         };
         await redis.geoadd(
-          "locations",
+          "locations:world",
           longitude,
           latitude,
           offer.id_salesforce_external
         );
         await redis.geoadd(
-          geoData.continent_code.toLowerCase().replace(/\s+/g, ""),
+          `locations:continent:${stringsToKeys(geoData.continent_code)}`,
           longitude,
           latitude,
           offer.id_salesforce_external
         );
         await redis.geoadd(
-          geoData.country.toLowerCase().replace(/\s+/g, ""),
+          `locations:country:${stringsToKeys(geoData.country)}`,
           longitude,
           latitude,
           offer.id_salesforce_external
         );
         await redis.geoadd(
-          geoData.administrative_area_level_1.toLowerCase().replace(/\s+/g, ""),
+          `locations:administrative_area_level_1:${stringsToKeys(
+            geoData.administrative_area_level_1
+          )}`,
           longitude,
           latitude,
           offer.id_salesforce_external
         );
-        await redis.set(offer.id_salesforce_external, JSON.stringify(data)); // TODO expire keys when offer ends
+        await redis.hmset(`offer:${offer.id_salesforce_external}`, data);
         for (let j = 0; j < offer.locations.length; j++) {
           const location = offer.locations[j];
           await redis.geoadd(
-            location.toLowerCase().replace(/\s+/g, ""),
+            `locations:name:${stringsToKeys(location)}`,
             longitude,
             latitude,
             offer.id_salesforce_external
@@ -57,17 +134,27 @@ export async function indexOffers(): Promise<void> {
         for (let j = 0; j < offer.holiday_types.length; j++) {
           const holidayType = offer.holiday_types[j];
           await redis.geoadd(
-            holidayType.toLowerCase().replace(/\s+/g, ""),
+            `locations:holidayType:${stringsToKeys(holidayType)}`,
             longitude,
             latitude,
             offer.id_salesforce_external
           );
         }
+        indexedOffers.push(offer.id_salesforce_external);
       } catch (err) {
+        offersUnableToIndex.push(offer.id_salesforce_external);
         logger("error", "Indexing Error", {
           id_salesforce_external: offer.id_salesforce_external
         });
       }
     }
   }
+  return {
+    indexedOffers,
+    indexedOffersCount: indexedOffers.length,
+    offersUnableToIndex,
+    offersUnableToIndexCount: offersUnableToIndex.length,
+    cleanedUpOffers,
+    cleanedUpOffersCount: cleanedUpOffers.length
+  };
 }

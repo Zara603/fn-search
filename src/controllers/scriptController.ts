@@ -5,6 +5,11 @@ export async function index(
   req: Request,
   res: Response
 ): Promise<Response | void> {
-  await indexOffers();
-  return res.json("done");
+  let result: any;
+  try {
+    result = await indexOffers();
+  } catch (err) {
+    result = err.message;
+  }
+  return res.json(result);
 }
