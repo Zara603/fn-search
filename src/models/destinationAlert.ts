@@ -29,6 +29,7 @@ export async function createUserDestinationAlert(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
+  locationAlert.created_at = new Date().toISOString();
   try {
     createUserDestinationAlertSFMC(locationAlert, user);
   } catch (err) {
@@ -70,5 +71,5 @@ export async function deleteUserDestinationAlert(
       user
     });
   }
-  return await deleteUserDestinationAlertRedis(id);
+  return await deleteUserDestinationAlertRedis(id, user);
 }

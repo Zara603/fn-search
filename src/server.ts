@@ -4,6 +4,7 @@ import * as geoSearchController from "./controllers/geoSearchController";
 import * as offerSearchController from "./controllers/offerSearchController";
 import * as locationAlertController from "./controllers/locationAlertController";
 import * as scriptController from "./controllers/scriptController";
+import * as adminController from "./controllers/adminController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
 
 export default function server(): any {
@@ -15,6 +16,12 @@ export default function server(): any {
   app.get("/api/search/offer-search", offerSearchController.index);
 
   app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
+
+  app.delete(
+    "/api/search/user-alert/:userId",
+    adminMiddleware,
+    adminController.deleteAlerts
+  );
 
   app.get(
     "/api/search/location-alert",
