@@ -11,7 +11,7 @@ export async function getAllHashes(keys: string[]): Promise<any[]> {
   return results.map(result => result[1]);
 }
 
-async function getAllOffersFromKeys(keys: string[]): Promise<any[]> {
+export async function getAllOffersFromKeys(keys: string[]): Promise<any[]> {
   const pipeline = redis.pipeline();
   keys.forEach(key => {
     pipeline.zrange(key, 0, -1);

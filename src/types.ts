@@ -11,6 +11,12 @@ interface IGeocode {
   lng?: number;
 }
 
+export interface IAvailableOffers {
+  continent: object[];
+  country: object[];
+  administrative_area_level_1: object[];
+}
+
 interface IAlert {
   level: string;
   value: string;
@@ -21,6 +27,7 @@ export interface IAlertObject {
   google_result: IGoogleResult;
   location_alert: IAlert;
   id?: string;
+  available_offers?: IAvailableOffers;
 }
 
 export interface IProperty {

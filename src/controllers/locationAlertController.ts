@@ -69,7 +69,9 @@ export async function deleteAlert(
     await deleteUserDestinationAlert(req.params.id, req.user);
   } catch (err) {
     logger("error", "Error deleting alert", err);
-    return res.status(500);
+    res.status(500);
+    res.end();
   }
-  return res.status(204);
+  res.status(204);
+  res.end();
 }

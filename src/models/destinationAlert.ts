@@ -61,6 +61,7 @@ export async function deleteUserDestinationAlert(
   id: string,
   user: IUser
 ): Promise<void> {
+  console.log("we are here");
   try {
     deleteUserDestinationAlertSFMC(id, user);
   } catch (err) {
