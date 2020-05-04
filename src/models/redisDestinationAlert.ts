@@ -1,7 +1,11 @@
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
-import { IUser, IAlertObject } from "../types";
-import { getAllHashes } from "../lib/redisFunctions";
+import { IUser, IAlertObject, IAvailableOffers } from "../types";
+import {
+  getAllHashes,
+  getAllOffersFromKeys,
+  stringsToKeys
+} from "../lib/redisFunctions";
 
 function getKey(value: any, keyType: string): string {
   return `${keyType}:${value}`;
@@ -25,7 +29,7 @@ function flattenAlertObject(user: IUser, locationAlert: IAlertObject): object {
   };
 }
 
-function buildAlertObject(flatAlert: any): IAlertObject {
+function buildAlertObject(flatAlert: any, availableOffers: any): IAlertObject {
   return {
     id: flatAlert.id,
     google_result: {
@@ -42,7 +46,26 @@ function buildAlertObject(flatAlert: any): IAlertObject {
       },
       level: flatAlert.level,
       value: flatAlert.value
-    }
+    },
+    available_offers: availableOffers
+  };
+}
+
+async function getAvailableOffers(
+  destinationAlert: any
+): Promise<IAvailableOffers> {
+  return {
+    continent: await getAllOffersFromKeys([
+      `locations:continent:${stringsToKeys(destinationAlert.continent)}`
+    ]),
+    country: await getAllOffersFromKeys([
+      `locations:country:${stringsToKeys(destinationAlert.country)}`
+    ]),
+    administrative_area_level_1: await getAllOffersFromKeys([
+      `locations:administrative_area_level_1:${stringsToKeys(
+        destinationAlert.administrative_area_level_1
+      )}`
+    ])
   };
 }
 
@@ -55,11 +78,15 @@ export async function getUserDestinationAlertsRedis(
   if (!alertIds) {
     return;
   }
+  const alerts = alertIds.map(al => `alert:${al}`);
   try {
-    const flatObjects = await getAllHashes(alertIds);
+    const flatObjects = await getAllHashes(alerts);
     for (let i = 0; i < flatObjects.length; i++) {
       const destinationAlert = flatObjects[i];
-      destinationAlerts.push(buildAlertObject(destinationAlert));
+      const availableOffers = await getAvailableOffers(destinationAlert);
+      destinationAlerts.push(
+        buildAlertObject(destinationAlert, availableOffers)
+      );
     }
   } catch (err) {
     logger("error", "Error getting destination alerts in redis", err);
@@ -72,7 +99,7 @@ export async function createUserDestinationAlertRedis(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
-  const key = getKey(user, "destinationAlerts");
+  const key = getKey(user.herokuId, "destinationAlerts");
   try {
     await redis.rpush(key, locationAlert.id);
   } catch (err) {
@@ -115,7 +142,7 @@ export async function deleteUserDestinationAlertRedis(
   id: string
 ): Promise<void> {
   try {
-    await redis.del(id);
+    return await redis.del(id);
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;
