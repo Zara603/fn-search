@@ -28,6 +28,7 @@ export interface IAlertObject {
   location_alert: IAlert;
   id?: string;
   available_offers?: IAvailableOffers;
+  created_at?: string;
 }
 
 export interface IProperty {

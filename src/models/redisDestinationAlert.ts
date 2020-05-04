@@ -139,10 +139,14 @@ export async function updateUserDestinationAlertRedis(
 }
 
 export async function deleteUserDestinationAlertRedis(
-  id: string
+  id: string,
+  user: IUser
 ): Promise<void> {
   try {
-    return await redis.del(id);
+    const alertKey = getKey(id, "alert");
+    await redis.del(alertKey);
+    const destinationKey = getKey(user.herokuId, "destinationAlert");
+    return await redis.lrem(destinationKey, -1, id);
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;
