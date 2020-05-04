@@ -10,6 +10,7 @@ jobs:
       DATA_EXTENSION_KEY: testing 
       MARKETING_CLOUD_API_CLIENT_ID: testing
       MARKETING_CLOUD_API_CLIENT_SECRET: testing
+      KEY_LIMIT: 100
     steps:
       - checkout
 

@@ -1,17 +1,10 @@
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
 import { IUser, IAlertObject } from "../types";
+import { getAllHashes } from "../lib/redisFunctions";
 
-function getKey(user: IUser): string {
-  return `destinationAlert:${user.herokuId}`;
-}
-
-async function getAllHashs(keys: string[]): Promise<object[]> {
-  const pipeline = redis.pipeline();
-  keys.forEach(key => {
-    pipeline.hgetall(key);
-  });
-  return await pipeline.exec();
+function getKey(value: any, keyType: string): string {
+  return `${keyType}:${value}`;
 }
 
 function flattenAlertObject(user: IUser, locationAlert: IAlertObject): object {
@@ -56,16 +49,16 @@ function buildAlertObject(flatAlert: any): IAlertObject {
 export async function getUserDestinationAlertsRedis(
   user: IUser
 ): Promise<void | IAlertObject[]> {
-  const key = getKey(user);
+  const key = getKey(user.herokuId, "destinationAlerts");
   const destinationAlerts: IAlertObject[] = [];
   const alertIds = await redis.lrange(key, 0, -1);
   if (!alertIds) {
     return;
   }
   try {
-    const flatObjects = await getAllHashs(alertIds);
+    const flatObjects = await getAllHashes(alertIds);
     for (let i = 0; i < flatObjects.length; i++) {
-      const destinationAlert = flatObjects[i][1];
+      const destinationAlert = flatObjects[i];
       destinationAlerts.push(buildAlertObject(destinationAlert));
     }
   } catch (err) {
@@ -79,7 +72,7 @@ export async function createUserDestinationAlertRedis(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
-  const key = getKey(user);
+  const key = getKey(user, "destinationAlerts");
   try {
     await redis.rpush(key, locationAlert.id);
   } catch (err) {
@@ -92,7 +85,7 @@ export async function createUserDestinationAlertRedis(
   }
   try {
     await redis.hmset(
-      locationAlert.id,
+      getKey(locationAlert.id, "alert"),
       flattenAlertObject(user, locationAlert)
     );
   } catch (err) {
@@ -108,7 +101,7 @@ export async function updateUserDestinationAlertRedis(
 ): Promise<IAlertObject> {
   try {
     await redis.hmset(
-      locationAlert.id,
+      getKey(locationAlert.id, "alert"),
       flattenAlertObject(user, locationAlert)
     );
     return locationAlert;
