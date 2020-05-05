@@ -147,8 +147,8 @@ export async function deleteUserDestinationAlertRedis(
   try {
     const alertKey = getKey(id, "alert");
     await redis.del(alertKey);
-    const destinationKey = getKey(user.herokuId, "destinationAlert");
-    return await redis.lrem(destinationKey, -1, id);
+    const destinationKey = getKey(user.herokuId, "destinationAlerts");
+    return await redis.lrem(destinationKey, 1, id);
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;
