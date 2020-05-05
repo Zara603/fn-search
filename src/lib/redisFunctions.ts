@@ -24,8 +24,10 @@ export async function getAllOffersFromKeys(keys: string[]): Promise<any[]> {
   return await getAllHashes(offerIds);
 }
 
-export function stringsToKeys(value: string): string {
-  return value.toLowerCase().replace(/\s+/g, "");
+export function stringsToKeys(value: string): string | void {
+  if (value) {
+    return value.toLowerCase().replace(/\s+/g, "");
+  }
 }
 
 export async function searchRedis(searchTerm: string): Promise<any[]> {

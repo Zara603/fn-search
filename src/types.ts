@@ -12,9 +12,9 @@ interface IGeocode {
 }
 
 export interface IAvailableOffers {
-  continent: object[];
-  country: object[];
-  administrative_area_level_1: object[];
+  continent: string[];
+  country: string[];
+  administrative_area_level_1: string[];
 }
 
 interface IAlert {

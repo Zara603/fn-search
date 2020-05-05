@@ -9,15 +9,21 @@ function authorizationToCookie(bearerToken: string): string {
 export async function getUser(requestHeaders: any): Promise<AuthResponse> {
   const url = `https://${process.env.API_BASE_URL}/current_user`;
   delete requestHeaders.host;
-  const headers = {
-    Origin: `https://${process.env.WEBSITE_BASE_URL}`,
-    Cookie:
-      requestHeaders.cookie ||
-      authorizationToCookie(
-        requestHeaders.authorization.replace("Bearer ", "")
-      ),
-    Authorization: requestHeaders.authorization
-  };
+  let headers;
+  try {
+    headers = {
+      Origin: `https://${process.env.WEBSITE_BASE_URL}`,
+      Cookie:
+        requestHeaders.cookie ||
+        authorizationToCookie(
+          requestHeaders.authorization.replace("Bearer ", "")
+        ),
+      Authorization: requestHeaders.authorization
+    };
+  } catch (err) {
+    logger("error", "AuthResponse", err);
+    return { status: 403, user: undefined };
+  }
   const options = {
     method: "GET",
     headers

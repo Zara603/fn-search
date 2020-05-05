@@ -1,11 +1,7 @@
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
 import { IUser, IAlertObject, IAvailableOffers } from "../types";
-import {
-  getAllHashes,
-  getAllOffersFromKeys,
-  stringsToKeys
-} from "../lib/redisFunctions";
+import { getAllHashes, stringsToKeys } from "../lib/redisFunctions";
 
 function getKey(value: any, keyType: string): string {
   return `${keyType}:${value}`;
@@ -55,17 +51,23 @@ async function getAvailableOffers(
   destinationAlert: any
 ): Promise<IAvailableOffers> {
   return {
-    continent: await getAllOffersFromKeys([
-      `locations:continent:${stringsToKeys(destinationAlert.continent)}`
-    ]),
-    country: await getAllOffersFromKeys([
-      `locations:country:${stringsToKeys(destinationAlert.country)}`
-    ]),
-    administrative_area_level_1: await getAllOffersFromKeys([
+    continent: await redis.zrange(
+      `locations:continent:${stringsToKeys(destinationAlert.continent)}`,
+      0,
+      -1
+    ),
+    country: await redis.zrange(
+      `locations:country:${stringsToKeys(destinationAlert.country)}`,
+      0,
+      -1
+    ),
+    administrative_area_level_1: await redis.zrange(
       `locations:administrative_area_level_1:${stringsToKeys(
         destinationAlert.administrative_area_level_1
-      )}`
-    ])
+      )}`,
+      0,
+      -1
+    )
   };
 }
 
