@@ -15,6 +15,7 @@ export interface IAvailableOffers {
   continent: string[];
   country: string[];
   administrative_area_level_1: string[];
+  local: string[];
 }
 
 interface IAlert {

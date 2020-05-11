@@ -50,6 +50,8 @@ function buildAlertObject(flatAlert: any, availableOffers: any): IAlertObject {
 async function getAvailableOffers(
   destinationAlert: any
 ): Promise<IAvailableOffers> {
+  const RADIUS = process.env.RADIUS || 100;
+  const COUNT = process.env.COUNT || 100;
   return {
     continent: await redis.zrange(
       `locations:continent:${stringsToKeys(destinationAlert.continent)}`,
@@ -67,6 +69,15 @@ async function getAvailableOffers(
       )}`,
       0,
       -1
+    ),
+    local: await redis.georadius(
+      "locations:world",
+      destinationAlert.lng,
+      destinationAlert.lat,
+      RADIUS,
+      "km",
+      "COUNT",
+      COUNT
     )
   };
 }
