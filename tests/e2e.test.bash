@@ -56,22 +56,22 @@ else
   echo "${GREEN}update destination alert working ${status_code} ${RESET}\n"
 fi
 
-#echo "Testing deleteing destination alert"
-#status_code=$(curl -w "%{http_code}" -X DELETE "$1"/api/search/location-alert/"${response_id}" -H 'Cookie:access_token='"$2"'' -H "Content-Type: application/json"  -d "${UPDATE_BODY}")
-#
-#if [[ "$status_code" -ne 204 ]] ; then
-#  echo ${RED}"delete destination alert returning status code: ${status_code}${RESET}\n" 
-#  exit 1
-#else
-#  echo "${GREEN}delete destination alert working ${status_code} ${RESET}\n"
-#fi
-#
-#echo "Testing deleteing destination alert worked"
-#response=$(curl --w "| %{http_code}" "$1"/api/search/location-alert -H 'Cookie:access_token='"$2"'')
-#
-#if echo "$response" | grep -q "$response_id" ; then
-#  echo ${RED}"delete destination alert returning status code: ${status_code}${RESET}\n" 
-#  exit 1
-#else
-#  echo "${GREEN}delete destination alert working ${status_code} ${RESET}\n"
-#fi
+echo "Testing deleteing destination alert"
+status_code=$(curl -w "%{http_code}" -X DELETE "$1"/api/search/location-alert/"${response_id}" -H 'Cookie:access_token='"$2"'' -H "Content-Type: application/json"  -d "${UPDATE_BODY}")
+
+if [[ "$status_code" -ne 204 ]] ; then
+  echo ${RED}"delete destination alert returning status code: ${status_code}${RESET}\n" 
+  exit 1
+else
+  echo "${GREEN}delete destination alert working ${status_code} ${RESET}\n"
+fi
+
+echo "Testing deleteing destination alert worked"
+response=$(curl --w "| %{http_code}" "$1"/api/search/location-alert -H 'Cookie:access_token='"$2"'')
+
+if echo "$response" | grep -q "$response_id" ; then
+  echo ${RED}"delete destination alert returning status code: ${status_code}${RESET}\n" 
+  exit 1
+else
+  echo "${GREEN}delete destination alert working ${status_code} ${RESET}\n"
+fi
