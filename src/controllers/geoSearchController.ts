@@ -10,7 +10,7 @@ export async function index(
   const radius = req.query.radius || 20;
   const count = req.query.count || 10;
   const results = await redis.georadius(
-    "locations",
+    "locations:world",
     longitude,
     latitude,
     radius,
