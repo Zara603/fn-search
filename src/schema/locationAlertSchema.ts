@@ -21,7 +21,8 @@ const googleResultSchema = {
 
 const locationAlertSchema = {
   google_result: s.objectWithOnly(googleResultSchema),
-  location_alert: s.objectWithOnly(alertSchema)
+  location_alert: s.objectWithOnly(alertSchema),
+  place_id: s.string()
 };
 
 const schemas = {
