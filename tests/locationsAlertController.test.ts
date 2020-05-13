@@ -14,6 +14,7 @@ const expect = chai.expect
 chai.use(chaiHttp);
 
 const payload = {
+  place_id: "testing",
   google_result:{
     continent: "Oceania",
     country: "Australia",
