@@ -157,6 +157,7 @@ function buildAlertObject(results: ISoapResult[]): IAlertObject[] {
     const properties = result.Properties.Property;
     const resultObject = buildObject(properties);
     const alertObject = {
+      place_id: resultObject.place_id,
       id: resultObject.id,
       google_result: {
         continent: resultObject.continent,

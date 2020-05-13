@@ -25,6 +25,7 @@ interface IAlert {
 }
 
 export interface IAlertObject {
+  place_id: string;
   google_result: IGoogleResult;
   location_alert: IAlert;
   id?: string;

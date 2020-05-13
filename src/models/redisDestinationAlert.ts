@@ -27,6 +27,7 @@ function flattenAlertObject(user: IUser, locationAlert: IAlertObject): object {
 
 function buildAlertObject(flatAlert: any, availableOffers: any): IAlertObject {
   return {
+    place_id: flatAlert.place_id,
     id: flatAlert.id,
     google_result: {
       administrative_area_level_1: flatAlert.administrative_area_level_1,

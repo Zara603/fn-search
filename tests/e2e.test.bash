@@ -6,8 +6,8 @@
 RED=`tput setaf 1`
 GREEN=`tput setaf 2`
 RESET=`tput sgr0`
-CREATE_BODY='{"google_result":{"continent":"Oceania","country":"Australia","administrative_area_level_1":"New South Wales","locality":"","colloquial_area":"Sydney"},"location_alert":{"level":"colloquial_area","value":"Sydney","geocode":{"lng":150.2093,"lat":-33.8688}}}'
-UPDATE_BODY='{"google_result":{"continent":"Asia","country":"Australia","administrative_area_level_1":"New South Wales","locality":"","colloquial_area":"Sydney"},"location_alert":{"level":"colloquial_area","value":"Sydney","geocode":{"lng":150.2093,"lat":-33.8688}}}'
+CREATE_BODY='{"place_id": "testing","google_result":{"continent":"Oceania","country":"Australia","administrative_area_level_1":"New South Wales","locality":"","colloquial_area":"Sydney"},"location_alert":{"level":"colloquial_area","value":"Sydney","geocode":{"lng":150.2093,"lat":-33.8688}}}'
+UPDATE_BODY='{"place_id": "testing", "google_result":{"continent":"Asia","country":"Australia","administrative_area_level_1":"New South Wales","locality":"","colloquial_area":"Sydney"},"location_alert":{"level":"colloquial_area","value":"Sydney","geocode":{"lng":150.2093,"lat":-33.8688}}}'
 
 echo "Testing calling get offers without token"
 status_code=$(curl --write-out %{http_code} --silent --output /dev/null "$1"/api/search/location-alert)
