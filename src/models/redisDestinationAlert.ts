@@ -9,6 +9,7 @@ function getKey(value: any, keyType: string): string {
 
 function flattenAlertObject(user: IUser, locationAlert: IAlertObject): object {
   return {
+    place_id: locationAlert.place_id,
     id: locationAlert.id,
     personContactId: user.personContactId,
     herokuId: user.herokuId,
