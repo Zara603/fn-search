@@ -22,7 +22,8 @@ function flattenAlertObject(user: IUser, locationAlert: IAlertObject): object {
     administrative_area_level_1:
       locationAlert.google_result.administrative_area_level_1,
     colloquial_area: locationAlert.google_result.colloquial_area,
-    locality: locationAlert.google_result.locality
+    locality: locationAlert.google_result.locality,
+    created_at: locationAlert.created_at
   };
 }
 
