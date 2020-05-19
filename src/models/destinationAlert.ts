@@ -13,6 +13,7 @@ import {
   updateUserDestinationAlertRedis,
   deleteUserDestinationAlertRedis
 } from "./redisDestinationAlert";
+import { getContinent } from "../lib/countryToContinent";
 
 export async function getUserDestinationAlerts(
   user: IUser
@@ -29,6 +30,7 @@ export async function createUserDestinationAlert(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
+  locationAlert.google_result.continent = getContinent(locationAlert);
   locationAlert.created_at = new Date().toISOString();
   try {
     createUserDestinationAlertSFMC(locationAlert, user);
