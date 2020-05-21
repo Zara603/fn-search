@@ -33,6 +33,12 @@ export interface IAlertObject {
   created_at?: string;
 }
 
+export interface IPopularLocation {
+  id?: string;
+  tag: string;
+  location_alerts: IAlertObject[];
+}
+
 export interface IProperty {
   Name: string;
   Value: string;
