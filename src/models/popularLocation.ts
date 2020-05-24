@@ -17,9 +17,7 @@ async function getPopularLocation(
   popularLocationTag: string
 ): Promise<IPopularLocation> {
   const locationAlertKeys = await redis.smembers(popularLocationTag);
-  console.log("locationAlertKeys", locationAlertKeys);
   const location_alerts = await getAllAlerts(locationAlertKeys);
-  console.log("location_alerts", location_alerts);
   return {
     tag: cleanTag(popularLocationTag),
     location_alerts
