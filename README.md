@@ -18,9 +18,16 @@ $ yarn run dev
 
 ## Running the tests
 
+### Unit Tests
 ```
 $ yarn run test
 ```
+
+### e2e Tests
+```
+$ yarn run test:e2e
+```
+Note, you will need redis running locally in order to run e2e tests.
 
 ## Deployment
 
@@ -86,6 +93,13 @@ The search is performed against the holidayTypes, admin set locations array, Geo
 $ curl https://${API_BASE_URI}/api/search/offer-search?search=aus
 ```  
 
+## Popular Locations
+
+Popular Locations are locations set by admin users to highlight locations to users, a popular location will be made up of one or more
+location alert. a Popular Location might be `NZ & The Pacifc` and be made up of alerts for `New Zealand` , `Fiji` and `The Cook Islands` 
+
+For more information as to how Popular Locations work read the e2e tests for Popular Locations
+
 ##Redis Keys
 
 All redis keys currently have a prefix that helps with identifying the object, keys are as follows:
@@ -99,6 +113,8 @@ All redis keys currently have a prefix that helps with identifying the object, k
   - locations:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
   - destinationAlerts:{user.UUID} == key used to store a list of destination alert for that user. 
   - alert:{alert.UUID} == key used to store a hash of a destination alert. 
+  - popularLocations key used to store a set of a popularDestiontions. 
+  - popularLocation:{popularDestination.tag} key used to store a set of a location alerts, used to make up a popular destination. 
 
 ## Data Storage
 
