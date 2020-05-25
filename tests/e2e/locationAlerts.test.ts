@@ -55,7 +55,7 @@ describe('test e2e Location Alert', () => {
     expect(resp.body).to.deep.equal([]);
   });
 
-  it("create popular locations", async () => {
+  it("create location alert", async () => {
     const respOne = await chai.request(app)
       .post("/api/search/location-alert")
       .set("content-type", "application/json")
@@ -69,7 +69,7 @@ describe('test e2e Location Alert', () => {
     expect(respTwo.body[0].place_id).to.equal(payload.place_id);
   });
 
-  it("update popular location", async () => {
+  it("update location alert", async () => {
 
     const respOne = await chai.request(app)
       .get("/api/search/location-alert")
