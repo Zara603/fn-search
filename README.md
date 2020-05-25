@@ -98,7 +98,9 @@ $ curl https://${API_BASE_URI}/api/search/offer-search?search=aus
 Popular Locations are locations set by admin users to highlight locations to users, a popular location will be made up of one or more
 location alert. a Popular Location might be `NZ & The Pacifc` and be made up of alerts for `New Zealand` , `Fiji` and `The Cook Islands` 
 
-For more information as to how Popular Locations work read the e2e tests for Popular Locations
+For more information as to how Popular Locations work read the e2e tests for Popular Locations.
+
+A note about the Popular Locations API, it does not follow standard REST architecture.
 
 ##Redis Keys
 
