@@ -31,6 +31,7 @@ export interface IAlertObject {
   id?: string;
   available_offers?: IAvailableOffers;
   created_at?: string;
+  brand: string;
 }
 
 export interface IPopularLocation {
