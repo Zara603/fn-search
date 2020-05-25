@@ -48,6 +48,7 @@ export async function updateUserDestinationAlert(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
+  locationAlert.google_result.continent = getContinent(locationAlert);
   try {
     updateUserDestinationAlertSFMC(locationAlert, user);
   } catch (err) {
