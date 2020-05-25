@@ -14,6 +14,7 @@ const payload = {
   tag: "NZ & The Pacific",
   location_alerts: [
   {
+    brand: "luxuryescapes",
     place_id: "baa baa",
     google_result:{
       continent: "Oceania",
@@ -32,6 +33,7 @@ const payload = {
     }
   },
   {
+    brand: "luxuryescapes",
     place_id: "the islands",
     google_result:{
       continent: "Oceania",

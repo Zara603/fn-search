@@ -51,6 +51,7 @@ export function buildAlertObject(
     place_id: flatAlert.place_id,
     created_at: flatAlert.created_at,
     id: flatAlert.id,
+    brand: flatAlert.brand,
     google_result: {
       administrative_area_level_1: flatAlert.administrative_area_level_1,
       colloquial_area: flatAlert.colloquial_area,
@@ -77,6 +78,7 @@ export function flattenAlertObject(
   return {
     place_id: locationAlert.place_id,
     id: locationAlert.id,
+    brand: locationAlert.brand,
     personContactId: user ? user.personContactId : "",
     herokuId: user ? user.herokuId : "",
     level: locationAlert.location_alert.level,
