@@ -61,8 +61,8 @@ export function buildAlertObject(
     },
     location_alert: {
       geocode: {
-        lat: flatAlert.lat,
-        lng: flatAlert.lng
+        lat: parseFloat(flatAlert.lat),
+        lng: parseFloat(flatAlert.lng)
       },
       level: flatAlert.level,
       value: flatAlert.value
@@ -110,9 +110,7 @@ export async function getAllAlerts(keys: string[]): Promise<any[]> {
   for (let i = 0; i < flatObjects.length; i++) {
     const flatObject = flatObjects[i];
     const availableOffers = await getAvailableOffers(flatObject);
-    console.log(buildAlertObject(flatObject, availableOffers));
     alertObjects.push(buildAlertObject(flatObject, availableOffers));
-    console.log(alertObjects);
   }
   return alertObjects;
 }
