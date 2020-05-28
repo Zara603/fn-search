@@ -3,7 +3,6 @@ import redis from "../lib/redis";
 import { v4 as uuidv4 } from "uuid";
 import {
   flattenAlertObject,
-  getAllAlerts,
   getAllHashes,
   getKey,
   buildAlertObject
@@ -29,13 +28,12 @@ export async function getPopularLocation(
 
   for (let i = 0; i < allHashes.length; i++) {
     const hash = allHashes[i];
-    const locationAlert = buildAlertObject(hash)
     locationAlerts.push(buildAlertObject(hash));
   }
 
   return {
     tag: cleanTag(popularLocationTag),
-    location_alerts: locationAlerts 
+    location_alerts: locationAlerts
   };
 }
 
@@ -93,7 +91,7 @@ export async function addPopularLocation(
 ): Promise<string> {
   const popularLocationsTag = getPopularLocationKey(tag);
   const popularLocationAlerts = await getPopularLocation(popularLocationsTag);
-  const userAlertsSetKey = getKey(user.herokuId, "destinationAlerts")
+  const userAlertsSetKey = getKey(user.herokuId, "destinationAlerts");
   for (let i = 0; i < popularLocationAlerts.location_alerts.length; i++) {
     const newAlert = popularLocationAlerts.location_alerts[i];
     newAlert.tag_type = POPULAR_LOCATION_TAG_TYPE;
@@ -106,25 +104,24 @@ export async function addPopularLocation(
     );
     newAlert.id = newAlertKey;
     await redis.hmset(newAlertKey, flattenAlertObject(newAlert));
-    await redis.sadd(userAlertsSetKey, newAlertKey)
+    await redis.sadd(userAlertsSetKey, newAlertKey);
   }
-  return tag
+  return tag;
 }
 
 export async function removePopularLocation(
   tag: string,
   user: IUser
 ): Promise<string> {
-  const userAlertSetKey = getKey(user.herokuId, "destinationAlerts")
-  const userAlertKeys = await redis.smembers(userAlertSetKey );
-  const patten = `^alert:${POPULAR_LOCATION_TAG_TYPE}:${tag}:.*`
+  const userAlertSetKey = getKey(user.herokuId, "destinationAlerts");
+  const userAlertKeys = await redis.smembers(userAlertSetKey);
+  const patten = `^alert:${POPULAR_LOCATION_TAG_TYPE}:${tag}:.*`;
   const regex = new RegExp(patten);
   const tagKeys = userAlertKeys.filter(key => key.match(regex));
   const pipeline = redis.pipeline();
   tagKeys.forEach(key => {
     pipeline.del(key);
-    pipeline.srem(userAlertSetKey, key)
+    pipeline.srem(userAlertSetKey, key);
   });
-  const resp = await pipeline.exec()
   return await pipeline.exec(); // dont have to await
 }

@@ -24,7 +24,7 @@ export async function createUserDestinationAlertRedis(
 ): Promise<IAlertObject> {
   const key = getKey(user.herokuId, "destinationAlerts");
   try {
-    await redis.sadd(key, locationAlert.id);
+    await redis.sadd(key, getKey(locationAlert.id, "alert"));
   } catch (err) {
     logger(
       "error",

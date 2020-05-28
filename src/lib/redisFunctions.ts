@@ -4,8 +4,7 @@ import {
   IAvailableOffers,
   IAlertObject,
   IUser,
-  IUserAlerts,
-  ITagAlert
+  IUserAlerts
 } from "../types";
 
 const KEY_LIMIT = process.env.KEY_LIMIT || 100;
@@ -66,13 +65,16 @@ export async function getAvailableOffersForLevel(
 export async function getAvailableOffersForPopularDestination(
   keys: string[]
 ): Promise<string[]> {
-  const availableOffers: string[] = [];
+  let availableOffers: string[] = [];
   const flatObjects = await getAllHashes(keys);
   for (let i = 0; i < flatObjects.length; i++) {
     const flatObject = flatObjects[i];
-    const availableOffers = await getAvailableOffersForLevel(flatObject);
+    availableOffers = availableOffers.concat(
+      await getAvailableOffersForLevel(flatObject)
+    );
   }
-  return availableOffers;
+  const uniqueAvailableOffers = Array.from(new Set(availableOffers));
+  return uniqueAvailableOffers;
 }
 
 export async function getAvailableOffers(
@@ -191,7 +193,6 @@ export async function getAllAlerts(keys: string[]): Promise<IUserAlerts> {
     popular_locations: []
   };
 
-
   const allAlerts = await getAllHashes(keys);
   const tagGroups = groupBy(allAlerts, "tag_type");
 
@@ -199,7 +200,6 @@ export async function getAllAlerts(keys: string[]): Promise<IUserAlerts> {
   for (let i = 0; i < baseAlerts.length; i++) {
     const flatObject = baseAlerts[i];
     const availableOffers = await getAvailableOffers(flatObject);
-<<<<<<< HEAD
     userAlert.location_alerts.push(
       buildAlertObject(flatObject, availableOffers)
     );

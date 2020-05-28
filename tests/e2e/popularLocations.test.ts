@@ -136,8 +136,8 @@ describe('test e2e Popular Locations', () => {
       .post("/api/search/popular-location/tag")
       .set("content-type", "application/json")
       .send({tag: payload.tag});
-    console.log('what is the response', respOne.body)
-    expect(respOne.status).to.equal(202);
+    expect(respOne.status).to.equal(201);
+    expect(respOne.body).to.equal("tag: NZ & The Pacific added to users alerts")
   })
 
   it("delete popular location", async () => {
@@ -145,15 +145,16 @@ describe('test e2e Popular Locations', () => {
     payload.location_alerts.push(newLocationAlert)
 
     const respOne = await chai.request(app)
-      .post("/api/search/popular-location/delete")
+      .delete("/api/search/popular-location/tag")
       .set("content-type", "application/json")
-      .send(payload);
+      .send({tag: payload.tag});
     expect(respOne.status).to.equal(204);
 
+
     const respTwo = await chai.request(app)
-      .get("/api/search/popular-location")
+      .get("/api/search/location-alert")
     expect(respTwo.status).to.equal(200);
-    expect(respTwo.body).to.deep.equal([]);
+    expect(respTwo.body).to.deep.equal({location_alerts:[], popular_locations:[]});
   });
 
 });
