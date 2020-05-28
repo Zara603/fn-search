@@ -55,6 +55,7 @@ const payload = {
 }
 
 const newLocationAlert = {
+  brand: "luxuryescapes",
   place_id: "more islands",
   google_result:{
     continent: "Oceania",
@@ -129,6 +130,15 @@ describe('test locationAlertController Auth', () => {
     expect(respTwo.body[0].tag).to.equal(payload.tag);
     expect(respTwo.body[0].location_alerts.length).to.equal(payload.location_alerts.length);
   });
+
+  it("add popular location", async () => {
+    const respOne = await chai.request(app)
+      .post("/api/search/popular-location/tag")
+      .set("content-type", "application/json")
+      .send({tag: payload.tag});
+    console.log('what is the response', respOne.body)
+    expect(respOne.status).to.equal(202);
+  })
 
   it("delete popular location", async () => {
 

@@ -26,6 +26,8 @@ interface IAlert {
 
 export interface IAlertObject {
   place_id: string;
+  tag_type?: string;
+  tag_value?: string;
   google_result: IGoogleResult;
   location_alert: IAlert;
   id?: string;
@@ -38,6 +40,16 @@ export interface IPopularLocation {
   id?: string;
   tag: string;
   location_alerts: IAlertObject[];
+}
+
+export interface ITagAlert {
+  available_offers: string[];
+  tag: string;
+}
+
+export interface IUserAlerts {
+  location_alerts: IAlertObject[];
+  popular_locations: ITagAlert[];
 }
 
 export interface IProperty {

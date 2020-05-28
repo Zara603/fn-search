@@ -31,9 +31,14 @@ const popularLocationsSchema = {
   location_alerts: s.array({ of: locationAlertSchema })
 };
 
+const tagSchema = {
+  tag: s.string()
+};
+
 const schemas = {
   locationAlertSchema: s.objectWithOnly(locationAlertSchema),
-  popularLocationsSchema: s.objectWithOnly(popularLocationsSchema)
+  popularLocationsSchema: s.objectWithOnly(popularLocationsSchema),
+  tagSchema: s.objectWithOnly(tagSchema)
 };
 
 export default schemas;

@@ -3,7 +3,9 @@ import {
   getPopularLocations,
   createPopularLocation,
   updatePopularLocation,
-  deletePopularLocation
+  deletePopularLocation,
+  addPopularLocation,
+  removePopularLocation
 } from "../models/popularLocation";
 import schemas from "../schema/locationAlertSchema";
 
@@ -50,6 +52,35 @@ export async function remove(
   res: Response
 ): Promise<Response | void> {
   await deletePopularLocation(req.body.tag);
+  return res.status(204);
+}
+
+export async function addPopularTag(
+  req: Request,
+  res: Response
+): Promise<Response | void> {
+  const errors = schemas.tagSchema.match(req.body);
+  if (errors.length) {
+    res.status(400);
+    res.json({ errors });
+    return res.end();
+  }
+  await addPopularLocation(req.body.tag, req.user);
+  res.status(201);
+  return res.json(`tag: ${req.body.tag} added to users alerts`);
+}
+
+export async function removePopularTag(
+  req: Request,
+  res: Response
+): Promise<Response | void> {
+  const errors = schemas.tagSchema.match(req.body);
+  if (errors.length) {
+    res.status(400);
+    res.json({ errors });
+    return res.end();
+  }
+  await removePopularLocation(req.body.tag, req.user);
   res.status(204);
-  return res.json("");
+  return res.json(`tag: ${req.body.tag} removed from users alerts`);
 }

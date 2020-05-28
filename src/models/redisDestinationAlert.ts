@@ -1,6 +1,6 @@
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
-import { IUser, IAlertObject } from "../types";
+import { IUser, IAlertObject, IUserAlerts } from "../types";
 import { flattenAlertObject, getAllAlerts } from "../lib/redisFunctions";
 
 function getKey(value: any, keyType: string): string {
@@ -9,14 +9,13 @@ function getKey(value: any, keyType: string): string {
 
 export async function getUserDestinationAlertsRedis(
   user: IUser
-): Promise<void | IAlertObject[]> {
+): Promise<void | IUserAlerts> {
   const key = getKey(user.herokuId, "destinationAlerts");
-  const alertIds = await redis.lrange(key, 0, -1);
+  const alertIds = await redis.smembers(key);
   if (!alertIds) {
     return;
   }
-  const alerts = alertIds.map(al => `alert:${al}`);
-  return await getAllAlerts(alerts);
+  return await getAllAlerts(alertIds);
 }
 
 export async function createUserDestinationAlertRedis(
@@ -25,7 +24,7 @@ export async function createUserDestinationAlertRedis(
 ): Promise<IAlertObject> {
   const key = getKey(user.herokuId, "destinationAlerts");
   try {
-    await redis.rpush(key, locationAlert.id);
+    await redis.sadd(key, locationAlert.id);
   } catch (err) {
     logger(
       "error",
@@ -70,7 +69,7 @@ export async function deleteUserDestinationAlertRedis(
     const alertKey = getKey(id, "alert");
     await redis.del(alertKey);
     const destinationKey = getKey(user.herokuId, "destinationAlerts");
-    return await redis.lrem(destinationKey, 1, id);
+    return await redis.srem(destinationKey, id);
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;

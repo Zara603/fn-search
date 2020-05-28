@@ -1,9 +1,16 @@
-import { IPopularLocation } from "../types";
+import { IPopularLocation, IUser, IAlertObject } from "../types";
 import redis from "../lib/redis";
 import { v4 as uuidv4 } from "uuid";
-import { flattenAlertObject, getAllAlerts } from "../lib/redisFunctions";
+import {
+  flattenAlertObject,
+  getAllAlerts,
+  getAllHashes,
+  getKey,
+  buildAlertObject
+} from "../lib/redisFunctions";
 
 const POPULAR_LOCATIONS_KEY = "popularLocations";
+const POPULAR_LOCATION_TAG_TYPE = "popularLocation";
 
 function getPopularLocationKey(popularLocationTag: string): string {
   return `popularLocation:${popularLocationTag}`;
@@ -13,14 +20,22 @@ function cleanTag(tag: string): string {
   return tag.replace("popularLocation:", "");
 }
 
-async function getPopularLocation(
+export async function getPopularLocation(
   popularLocationTag: string
 ): Promise<IPopularLocation> {
   const locationAlertKeys = await redis.smembers(popularLocationTag);
-  const location_alerts = await getAllAlerts(locationAlertKeys);
+  const allHashes = await getAllHashes(locationAlertKeys);
+  const locationAlerts: IAlertObject[] = [];
+
+  for (let i = 0; i < allHashes.length; i++) {
+    const hash = allHashes[i];
+    const locationAlert = buildAlertObject(hash)
+    locationAlerts.push(buildAlertObject(hash));
+  }
+
   return {
     tag: cleanTag(popularLocationTag),
-    location_alerts
+    location_alerts: locationAlerts 
   };
 }
 
@@ -70,4 +85,46 @@ export async function deletePopularLocation(
   });
   pipeline.srem(POPULAR_LOCATIONS_KEY, popularLocationKey);
   await pipeline.exec();
+}
+
+export async function addPopularLocation(
+  tag: string,
+  user: IUser
+): Promise<string> {
+  const popularLocationsTag = getPopularLocationKey(tag);
+  const popularLocationAlerts = await getPopularLocation(popularLocationsTag);
+  const userAlertsSetKey = getKey(user.herokuId, "destinationAlerts")
+  for (let i = 0; i < popularLocationAlerts.location_alerts.length; i++) {
+    const newAlert = popularLocationAlerts.location_alerts[i];
+    newAlert.tag_type = POPULAR_LOCATION_TAG_TYPE;
+    newAlert.tag_value = tag;
+    const newAlertKey = getKey(
+      uuidv4(),
+      "alert",
+      POPULAR_LOCATION_TAG_TYPE,
+      tag
+    );
+    newAlert.id = newAlertKey;
+    await redis.hmset(newAlertKey, flattenAlertObject(newAlert));
+    await redis.sadd(userAlertsSetKey, newAlertKey)
+  }
+  return tag
+}
+
+export async function removePopularLocation(
+  tag: string,
+  user: IUser
+): Promise<string> {
+  const userAlertSetKey = getKey(user.herokuId, "destinationAlerts")
+  const userAlertKeys = await redis.smembers(userAlertSetKey );
+  const patten = `^alert:${POPULAR_LOCATION_TAG_TYPE}:${tag}:.*`
+  const regex = new RegExp(patten);
+  const tagKeys = userAlertKeys.filter(key => key.match(regex));
+  const pipeline = redis.pipeline();
+  tagKeys.forEach(key => {
+    pipeline.del(key);
+    pipeline.srem(userAlertSetKey, key)
+  });
+  const resp = await pipeline.exec()
+  return await pipeline.exec(); // dont have to await
 }
