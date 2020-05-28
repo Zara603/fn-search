@@ -18,6 +18,9 @@ export default function server(): any {
 
   app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
 
+  // TODO remove this route before going into production.
+  app.get("/api/search/flush-all", adminMiddleware, adminController.flushAll);
+
   app.get("/api/search/popular-location", popularLocationController.index);
 
   app.post(

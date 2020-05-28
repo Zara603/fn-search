@@ -18,3 +18,13 @@ export async function deleteAlerts(
   res.status(204);
   return res.json(result);
 }
+
+// TODO remove before going into production
+export async function flushAll(
+  req: Request,
+  res: Response
+): Promise<Response | void> {
+  redis.flushall();
+  res.status(200);
+  return res.json("everything down the toilet");
+}
