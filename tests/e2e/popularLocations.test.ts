@@ -75,7 +75,7 @@ const newLocationAlert = {
 }
 
 
-describe('test locationAlertController Auth', () => {
+describe('test e2e Popular Locations', () => {
   let authStub;
 
   before(async () => {
