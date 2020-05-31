@@ -55,6 +55,7 @@ const payload = {
 }
 
 const newLocationAlert = {
+  brand: "luxuryescapes",
   place_id: "more islands",
   google_result:{
     continent: "Oceania",
@@ -130,20 +131,30 @@ describe('test e2e Popular Locations', () => {
     expect(respTwo.body[0].location_alerts.length).to.equal(payload.location_alerts.length);
   });
 
+  it("add popular location", async () => {
+    const respOne = await chai.request(app)
+      .post("/api/search/popular-location/tag")
+      .set("content-type", "application/json")
+      .send({tag: payload.tag});
+    expect(respOne.status).to.equal(201);
+    expect(respOne.body).to.equal("tag: NZ & The Pacific added to users alerts")
+  })
+
   it("delete popular location", async () => {
 
     payload.location_alerts.push(newLocationAlert)
 
     const respOne = await chai.request(app)
-      .post("/api/search/popular-location/delete")
+      .delete("/api/search/popular-location/tag")
       .set("content-type", "application/json")
-      .send(payload);
+      .send({tag: payload.tag});
     expect(respOne.status).to.equal(204);
 
+
     const respTwo = await chai.request(app)
-      .get("/api/search/popular-location")
+      .get("/api/search/location-alert")
     expect(respTwo.status).to.equal(200);
-    expect(respTwo.body).to.deep.equal([]);
+    expect(respTwo.body).to.deep.equal({location_alerts:[], popular_locations:[]});
   });
 
 });

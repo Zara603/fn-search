@@ -35,8 +35,8 @@ export default function server(): any {
     popularLocationController.update
   );
 
-  app.post(
-    "/api/search/popular-location/delete",
+  app.delete(
+    "/api/search/popular-location",
     adminMiddleware,
     popularLocationController.remove
   );
@@ -45,6 +45,18 @@ export default function server(): any {
     "/api/search/popular-location",
     adminMiddleware,
     popularLocationController.create
+  );
+
+  app.post(
+    "/api/search/popular-location/tag",
+    authMiddleware,
+    popularLocationController.addPopularTag
+  );
+
+  app.delete(
+    "/api/search/popular-location/tag",
+    authMiddleware,
+    popularLocationController.removePopularTag
   );
 
   app.delete(
