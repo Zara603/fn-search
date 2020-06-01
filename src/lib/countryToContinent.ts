@@ -209,3 +209,7 @@ export function getContinent(locationAlert: IAlertObject): string {
     return continent;
   }
 }
+
+export function getContinentFromCountry(country:string): string {
+  return countryToContinentMapping[country] || ""
+}
