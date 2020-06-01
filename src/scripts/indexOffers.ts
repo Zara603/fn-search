@@ -1,6 +1,7 @@
 import { getOffers } from "../services/offer";
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
+import { getContinentFromCountry } from "../lib/countryToContinent";
 import { getAllHashes, stringsToKeys } from "../lib/redisFunctions";
 
 async function cleanUpOldOffers(newOfferIds: string[]): Promise<string[]> {
@@ -73,6 +74,7 @@ export async function indexOffers(): Promise<any> {
         const { latitude } = offer.lowest_price_package.property;
         const { longitude } = offer.lowest_price_package.property;
         const geoData = offer.lowest_price_package.property.geo_data;
+        geoData.continent = getContinentFromCountry(geoData.country);
 
         const data = {
           locations: offer.locations,
@@ -82,7 +84,7 @@ export async function indexOffers(): Promise<any> {
           id_salesforce_external: offer.id_salesforce_external,
           lat: latitude,
           lng: longitude,
-          continent: geoData.continent_code,
+          continent: geoData.continent,
           country: geoData.country,
           administrative_area_level_1: geoData.administrative_area_level_1,
           url: `https://${process.env.WEBSITE_BASE_URL}/${offer.slug}/${offer.id_salesforce_external}`
@@ -94,7 +96,7 @@ export async function indexOffers(): Promise<any> {
           offer.id_salesforce_external
         );
         await redis.geoadd(
-          `locations:continent:${stringsToKeys(geoData.continent_code)}`,
+          `locations:continent:${stringsToKeys(geoData.continent)}`,
           longitude,
           latitude,
           offer.id_salesforce_external
