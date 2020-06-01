@@ -74,7 +74,7 @@ export async function indexOffers(): Promise<any> {
         const { latitude } = offer.lowest_price_package.property;
         const { longitude } = offer.lowest_price_package.property;
         const geoData = offer.lowest_price_package.property.geo_data;
-        geoData.continent = getContinentFromCountry(geoData.country)
+        geoData.continent = getContinentFromCountry(geoData.country);
 
         const data = {
           locations: offer.locations,

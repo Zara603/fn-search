@@ -210,6 +210,6 @@ export function getContinent(locationAlert: IAlertObject): string {
   }
 }
 
-export function getContinentFromCountry(country:string): string {
-  return countryToContinentMapping[country] || ""
+export function getContinentFromCountry(country: string): string {
+  return countryToContinentMapping[country] || "";
 }
