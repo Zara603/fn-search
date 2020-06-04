@@ -9,7 +9,7 @@ import {
 } from "../lib/redisFunctions";
 
 const POPULAR_LOCATIONS_KEY = "popularLocations";
-const POPULAR_LOCATION_TAG_TYPE = "popularLocation";
+const POPULAR_LOCATION_TAG_TYPE = process.env.POPULAR_LOCATION_TAG_TYPE  || "popularLocation";
 
 function getPopularLocationKey(popularLocationTag: string): string {
   return `popularLocation:${popularLocationTag}`;

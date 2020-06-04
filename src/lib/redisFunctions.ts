@@ -8,6 +8,7 @@ import {
 } from "../types";
 
 const KEY_LIMIT = process.env.KEY_LIMIT || 100;
+const POPULAR_LOCATION_TAG_TYPE = process.env.POPULAR_LOCATION_TAG_TYPE  || "popularLocation";
 
 export function getKey(
   value: any,
@@ -77,54 +78,55 @@ export async function getAvailableOffersForPopularDestination(
   return uniqueAvailableOffers;
 }
 
-export async function getAvailableOffers(
-  destinationAlert: any
-): Promise<IAvailableOffers> {
+
+export async function getAvailableOffers(alerts:any):Promise<void> {
   const RADIUS = process.env.RADIUS || 100;
   const COUNT = process.env.COUNT || 100;
-  return {
-    continent: await redis.zrange(
-      `locations:continent:${stringsToKeys(destinationAlert.continent)}`,
+  const pipeline = redis.pipeline()
+  alerts.forEach(alt => {
+    alt.available_offers = []
+    pipeline.zrange(
+      `locations:continent:${stringsToKeys(alt.continent)}`,
       0,
-      -1
-    ),
-    country: await redis.zrange(
-      `locations:country:${stringsToKeys(destinationAlert.country)}`,
-      0,
-      -1
-    ),
-    administrative_area_level_1: await redis.zrange(
-      `locations:administrative_area_level_1:${stringsToKeys(
-        destinationAlert.administrative_area_level_1
-      )}`,
-      0,
-      -1
-    ),
-    local: await redis.georadius(
-      "locations:world",
-      destinationAlert.lng,
-      destinationAlert.lat,
-      RADIUS,
-      "km",
-      "COUNT",
-      COUNT
+      -1,
+      function(err, response) {alt.available_offers.continent = response}
     )
-  };
-}
-
-function groupBy(items: any, key: string): any {
-  return items.reduce(
-    (result, item) => ({
-      ...result,
-      [item[key]]: [...(result[item[key]] || []), item]
-    }),
-    {}
-  );
+    if (alt.country) {
+      pipeline.zrange(
+        `locations:country:${stringsToKeys(alt.country)}`,
+        0,
+        -1,
+        function(err, response) {alt.available_offers.country = response}
+      )
+    }
+    if (alt.administrative_area_level_1) {
+      pipeline.zrange(
+        `locations:administrative_area_level_1:${stringsToKeys(
+          alt.administrative_area_level_1
+        )}`,
+        0,
+        -1,
+        function(err, response) {alt.available_offers.administrative_area_level_1 = response}
+      )
+    }
+    if(alt.lat && alt.lng) {
+      pipeline.georadius(
+        "locations:world",
+        alt.lng,
+        alt.lat,
+        RADIUS,
+        "km",
+        "COUNT",
+        COUNT,
+        function(err, response) {alt.available_offers.local = response}
+      )
+    }
+  })
+  await pipeline.exec()
 }
 
 export function buildAlertObject(
   flatAlert: any,
-  availableOffers?: any
 ): IAlertObject {
   return {
     id: flatAlert.id,
@@ -148,7 +150,7 @@ export function buildAlertObject(
       level: flatAlert.level,
       value: flatAlert.value
     },
-    available_offers: availableOffers
+    available_offers: flatAlert.availableOffers
   };
 }
 
@@ -188,46 +190,26 @@ export async function getAllHashes(keys: string[]): Promise<any[]> {
 }
 
 export async function getAllAlerts(keys: string[]): Promise<IUserAlerts> {
-  const userAlert: IUserAlerts = {
-    location_alerts: [],
-    popular_locations: []
-  };
 
+  // trip two to redis
   const allAlerts = await getAllHashes(keys);
-  const tagGroups = groupBy(allAlerts, "tag_type");
+  // trip three to redis
+  await getAvailableOffers(allAlerts)
+  const flatDestinationAlerts = allAlerts.filter(alt => alt.tag_type === 'alert')
+  const location_alerts = flatDestinationAlerts.map(alt => buildAlertObject(alt))
 
-  const baseAlerts = tagGroups["alert"] || [];
-  for (let i = 0; i < baseAlerts.length; i++) {
-    const flatObject = baseAlerts[i];
-    const availableOffers = await getAvailableOffers(flatObject);
-    userAlert.location_alerts.push(
-      buildAlertObject(flatObject, availableOffers)
-    );
+  const flatPopularDestinationAlert = allAlerts.filter(alt => alt.tag_type === POPULAR_LOCATION_TAG_TYPE)
+  const popular_locations:any[] = []
+  flatPopularDestinationAlert.forEach(alt => {
+    popular_locations.push({
+      tag: alt.tag_value,
+      available_offer: alt.available_offers
+    })
+  }) 
+  return {
+    location_alerts,
+    popular_locations 
   }
-
-  const popularLocationAlerts = tagGroups["popularLocation"] || [];
-  const popularLocationGroups =
-    groupBy(popularLocationAlerts, "tag_value") || [];
-  const popularLocationKeys = Object.keys(popularLocationGroups);
-  // TODO can this be done without going O(n^2)?
-  // Maybe if we change the alerts keys structure then we can get away from this
-  // Something like `alert:uuid:tag_type:tag_value` that way we can filter the keys
-  // before a get is made.
-  for (let i = 0; i < popularLocationKeys.length; i++) {
-    const tag = popularLocationKeys[i];
-    let availableOffers: string[] = [];
-    for (let j = 0; j < popularLocationGroups[tag].length; j++) {
-      const flatObject = popularLocationGroups[tag][j];
-      availableOffers = availableOffers.concat(
-        await getAvailableOffersForLevel(flatObject)
-      );
-    }
-    userAlert.popular_locations.push({
-      tag,
-      available_offers: Array.from(new Set(availableOffers)) // ensure unique offer ids
-    });
-  }
-  return userAlert;
 }
 
 export async function getAllOffersFromKeys(
