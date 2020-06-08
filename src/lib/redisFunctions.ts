@@ -1,14 +1,9 @@
 import redis from "../lib/redis";
-import {
-  IPopularLocation,
-  IAvailableOffers,
-  IAlertObject,
-  IUser,
-  IUserAlerts
-} from "../types";
+import { IPopularLocation, IAlertObject, IUser, IUserAlerts } from "../types";
 
 const KEY_LIMIT = process.env.KEY_LIMIT || 100;
-const POPULAR_LOCATION_TAG_TYPE = process.env.POPULAR_LOCATION_TAG_TYPE  || "popularLocation";
+const POPULAR_LOCATION_TAG_TYPE =
+  process.env.POPULAR_LOCATION_TAG_TYPE || "popularLocation";
 
 export function getKey(
   value: any,
@@ -78,26 +73,29 @@ export async function getAvailableOffersForPopularDestination(
   return uniqueAvailableOffers;
 }
 
-
-export async function getAvailableOffers(alerts:any):Promise<void> {
+export async function getAvailableOffers(alerts: any): Promise<void> {
   const RADIUS = process.env.RADIUS || 100;
   const COUNT = process.env.COUNT || 100;
-  const pipeline = redis.pipeline()
+  const pipeline = redis.pipeline();
   alerts.forEach(alt => {
-    alt.available_offers = []
+    alt.available_offers = [];
     pipeline.zrange(
       `locations:continent:${stringsToKeys(alt.continent)}`,
       0,
       -1,
-      function(err, response) {alt.available_offers.continent = response}
-    )
+      function(err, response) {
+        alt.available_offers.continent = response;
+      }
+    );
     if (alt.country) {
       pipeline.zrange(
         `locations:country:${stringsToKeys(alt.country)}`,
         0,
         -1,
-        function(err, response) {alt.available_offers.country = response}
-      )
+        function(err, response) {
+          alt.available_offers.country = response;
+        }
+      );
     }
     if (alt.administrative_area_level_1) {
       pipeline.zrange(
@@ -106,10 +104,12 @@ export async function getAvailableOffers(alerts:any):Promise<void> {
         )}`,
         0,
         -1,
-        function(err, response) {alt.available_offers.administrative_area_level_1 = response}
-      )
+        function(err, response) {
+          alt.available_offers.administrative_area_level_1 = response;
+        }
+      );
     }
-    if(alt.lat && alt.lng) {
+    if (alt.lat && alt.lng) {
       pipeline.georadius(
         "locations:world",
         alt.lng,
@@ -118,16 +118,16 @@ export async function getAvailableOffers(alerts:any):Promise<void> {
         "km",
         "COUNT",
         COUNT,
-        function(err, response) {alt.available_offers.local = response}
-      )
+        function(err, response) {
+          alt.available_offers.local = response;
+        }
+      );
     }
-  })
-  await pipeline.exec()
+  });
+  await pipeline.exec();
 }
 
-export function buildAlertObject(
-  flatAlert: any,
-): IAlertObject {
+export function buildAlertObject(flatAlert: any): IAlertObject {
   return {
     id: flatAlert.id,
     tag_type: flatAlert.tag_type,
@@ -190,26 +190,35 @@ export async function getAllHashes(keys: string[]): Promise<any[]> {
 }
 
 export async function getAllAlerts(keys: string[]): Promise<IUserAlerts> {
-
   // trip two to redis
   const allAlerts = await getAllHashes(keys);
   // trip three to redis
-  await getAvailableOffers(allAlerts)
-  const flatDestinationAlerts = allAlerts.filter(alt => alt.tag_type === 'alert')
-  const location_alerts = flatDestinationAlerts.map(alt => buildAlertObject(alt))
+  await getAvailableOffers(allAlerts);
+  const flatDestinationAlerts = allAlerts.filter(
+    alt => alt.tag_type === "alert"
+  );
+  const location_alerts = flatDestinationAlerts.map(alt =>
+    buildAlertObject(alt)
+  );
 
-  const flatPopularDestinationAlert = allAlerts.filter(alt => alt.tag_type === POPULAR_LOCATION_TAG_TYPE)
-  const popular_locations:any[] = []
+  const flatPopularDestinationAlert = allAlerts.filter(
+    alt => alt.tag_type === POPULAR_LOCATION_TAG_TYPE
+  );
+  const popular_locations: any[] = [];
+  const popularLocationsKeys = new Set();
   flatPopularDestinationAlert.forEach(alt => {
-    popular_locations.push({
-      tag: alt.tag_value,
-      available_offer: alt.available_offers
-    })
-  }) 
+    if (!popularLocationsKeys.has(alt.tag_value)) {
+      popular_locations.push({
+        tag: alt.tag_value,
+        available_offer: alt.available_offers
+      });
+      popularLocationsKeys.add(alt.tag_value);
+    }
+  });
   return {
     location_alerts,
-    popular_locations 
-  }
+    popular_locations
+  };
 }
 
 export async function getAllOffersFromKeys(
