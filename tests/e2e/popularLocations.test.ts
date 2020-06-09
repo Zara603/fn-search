@@ -88,7 +88,7 @@ describe('test e2e Popular Locations', () => {
 
   after(async() => {
     // switch back to database 0 after tests
-    await redis.flushall();
+    await redis.flushdb();
     await redis.select(0)
     authStub.restore();
   });
