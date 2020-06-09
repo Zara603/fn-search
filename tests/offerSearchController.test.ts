@@ -21,7 +21,7 @@ const response = [
     "locations": "Australia,New South Wales",
     "name": "test offer 1",
     "slug": "test-offer-1",
-    "url": "https://luxuryescapes.com/test-offer-1/sdfas1241",
+    "url": `https://${process.env.WEBSITE_BASE_URL}/test-offer-1/sdfas1241`,
   }
 ]
 

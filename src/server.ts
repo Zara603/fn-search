@@ -1,6 +1,5 @@
 import * as express from "express";
 import { json as bodyParserJson } from "body-parser";
-import * as geoSearchController from "./controllers/geoSearchController";
 import * as offerSearchController from "./controllers/offerSearchController";
 import * as locationAlertController from "./controllers/locationAlertController";
 import * as scriptController from "./controllers/scriptController";
@@ -12,17 +11,12 @@ export default function server(): any {
   const app: express.Application = express();
   app.use(bodyParserJson());
 
-  app.get("/api/search/geo-search", geoSearchController.index);
-
-  app.get("/api/search/offer-search", offerSearchController.index);
-
   app.get(
     "/api/search/offer-search/:level/:value",
     offerSearchController.getOffers
   );
 
-  //app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
-  app.get("/api/search/index-offers", scriptController.index);
+  app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
 
   // TODO remove this route before going into production.
   app.get("/api/search/flush-all", adminMiddleware, adminController.flushAll);
