@@ -71,7 +71,7 @@ describe('test offer location search', () => {
       ...response[0]
     }
     const resp = await chai.request(app)
-      .get("/api/search/offer-search/locality/Sydney?lat=-33.8688&lng=151.2092")
+      .get("/api/search/offer-search/geo?lat=-33.8688&lng=151.2092")
     expect(resp.status).to.equal(200);
     expect(resp.body).to.deep.equal([geoResponse]);
   })

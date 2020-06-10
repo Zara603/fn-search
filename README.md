@@ -101,11 +101,17 @@ In order to search any level below `administration_level_one` a latitude and lon
 If the `lat` and `lng` query params are detected, the search will default to a geo bounds box search and the level and value are used only as a 
 human readable guide within the URL, but have no effect.
 
-### eg: searching for offers around the area of Bondi
+
+### Geo Bounds Box search
+
+To search in a radis of a given `lat` and `lng`, eg: lat=0.00 lng=0.00 (the equator on the greenwich meridian line)
+
+The query param `radius` denotes a radius from the central point in KM, default radius is 20KM.
 
 ```
-$ curl https://${API_BASE_URI}/api/search/offer-search/locality/bondi?lat=-33.868&lng=151.209
+$ curl https://${API_BASE_URI}/api/search/geo-search?lat=0.00&lng=0.00&radius=1000
 ```  
+
    
 ### Notes about search
 
@@ -114,7 +120,6 @@ URL will return the same result
 
 ```
 $ curl https://${API_BASE_URI}/api/search/offer-search/Continent/Asia
-
 $ curl https://${API_BASE_URI}/api/search/offer-search/continent/asia
 ```  
 
