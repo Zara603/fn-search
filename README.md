@@ -1,6 +1,6 @@
 # Search Service
 
-A lambda function that allows us to perform searchers against our current offerst.
+A service that allows users to search for available offers by geographical location.
 
 ### Prerequisites
 
@@ -33,11 +33,13 @@ Note, you will need redis running locally in order to run e2e tests.
 
 This repo is deployed using Apex up
 
-## NOTE
+## NOTES
+
 
 For all following curl examples subsitute ${ACCESS_TOKEN} and ${API_BASE_URI} for your given user and enviroment.
 
 ${ALERT_ID} is the UUID of the given Destination Alert.
+
 
 ## Indexing Offer Data into REDIS:
 
@@ -69,28 +71,51 @@ $ curl -X DELETE  -H 'Cookie:access_token='"$ACCESS_TOKEN"''  https://${API_BASE
 
 ## Searching for offers
 
-Offers can be searched for using two methods, geo bounds box or using a search term
-
-### Geo Bounds Box search
-
-To search in a radis of a given `lat` and `lng`, eg: lat=0.00 lng=0.00 (the equator on the greenwich meridian line)
-
-The query param `radius` denotes a radius from the central point in KM, default radius is 20KM.
+Offers can be searched using the following URL 
 
 ```
-$ curl https://${API_BASE_URI}/api/search/geo-search?lat=0.00&lng=0.00&radius=1000
+https://${API_BASE_URI}/api/search/offer-search/${level}/${value}
+```
+
+The given `levels` match the levels found within the Google geo_data object, continent, country, adminstration_level_1, locality, colloquial_area.
+
+### eg: getting offers within the continent of Asia, level = continent value = Asia
+
+```
+$ curl https://${API_BASE_URI}/api/search/offer-search/continent/Asia
 ```  
 
-### Search using a search term
-
-Search terms do not have to be full words in order to match `aus` will match `Australia`, `Austria` and all other words that contain `aus`.
-
-Search terms are case insensitive, all whitespace is removed during search.
-
-The search is performed against the holidayTypes, admin set locations array, Geo country, continent and administrative_area_level_1 data.
+### eg: getting offers within the country of Australia, level = country value = Australia
 
 ```
-$ curl https://${API_BASE_URI}/api/search/offer-search?search=aus
+$ curl https://${API_BASE_URI}/api/search/offer-search/country/Australia
+```  
+
+### eg: getting offers within the administration_level_one of New South Wales, level = administration_level_one value = New South Wales
+
+```
+$ curl https://${API_BASE_URI}/api/search/offer-search/administration_level_one/New%20South%20Wales
+```  
+
+In order to search any level below `administration_level_one` a latitude and longitude has to be included as query params within the URL.
+If the `lat` and `lng` query params are detected, the search will default to a geo bounds box search and the level and value are used only as a 
+human readable guide within the URL, but have no effect.
+
+### eg: searching for offers around the area of Bondi
+
+```
+$ curl https://${API_BASE_URI}/api/search/offer-search/locality/bondi?lat=-33.868&lng=151.209
+```  
+   
+### Notes about search
+
+Both the `level` and `value` URL params are stripped of whitespace and casted to lowercase before a search is peformed, the following two
+URL will return the same result
+
+```
+$ curl https://${API_BASE_URI}/api/search/offer-search/Continent/Asia
+
+$ curl https://${API_BASE_URI}/api/search/offer-search/continent/asia
 ```  
 
 ## Popular Locations

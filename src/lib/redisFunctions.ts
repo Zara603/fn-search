@@ -243,7 +243,7 @@ export function stringsToKeys(value: string): string | void {
 }
 
 export async function searchRedis(searchTerm: string): Promise<any[]> {
-  const cleanedSearchTerm = searchTerm.toLowerCase().replace(/\s+/g, "");
+  const cleanedSearchTerm = stringsToKeys(searchTerm) || "";
   const keys = await redis.scan(
     0,
     "MATCH",
@@ -252,4 +252,31 @@ export async function searchRedis(searchTerm: string): Promise<any[]> {
     KEY_LIMIT
   );
   return await getAllOffersFromKeys(keys[1]);
+}
+
+export async function getOffersWithRadis(
+  lng: any,
+  lat: any,
+  radius = 20,
+  count = 10
+): Promise<any> {
+  const results = await redis.georadius(
+    "locations:world",
+    lng,
+    lat,
+    radius,
+    "km",
+    "WITHDIST",
+    "COUNT",
+    count
+  );
+  let localData = [];
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i];
+    const id = result[0];
+    const data = await redis.hgetall(`offer:${id}`);
+    data.distance_from_search = result[1];
+    localData = localData.concat(data);
+  }
+  return localData;
 }

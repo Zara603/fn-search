@@ -3,6 +3,7 @@ jobs:
   build:
     docker:
       - image: circleci/node:12.10.0
+      - image: redis  
     environment:
       APP_ENV: spec
       API_BASE_URL: api.testing.luxgroup.com
