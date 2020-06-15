@@ -4,6 +4,7 @@ import * as offerSearchController from "./controllers/offerSearchController";
 import * as locationAlertController from "./controllers/locationAlertController";
 import * as scriptController from "./controllers/scriptController";
 import * as adminController from "./controllers/adminController";
+import * as geoSearchController from "./controllers/geoSearchController";
 import * as popularLocationController from "./controllers/popularLocationController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
 
@@ -15,6 +16,8 @@ export default function server(): any {
     "/api/search/offer-search/:level/:value",
     offerSearchController.getOffers
   );
+
+  app.get("/api/search/offer-search/geo", geoSearchController.index);
 
   app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
 

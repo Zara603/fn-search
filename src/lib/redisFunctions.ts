@@ -257,8 +257,8 @@ export async function searchRedis(searchTerm: string): Promise<any[]> {
 export async function getOffersWithRadis(
   lng: any,
   lat: any,
-  radius = 20,
-  count = 10
+  radius: any = 20,
+  count: any = 10
 ): Promise<any> {
   const results = await redis.georadius(
     "locations:world",
