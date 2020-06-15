@@ -29,13 +29,12 @@ export async function adminMiddleware(
   next: Function
 ): Promise<void> {
   const authResponse: any = await getUser(req.headers);
+
   if (authResponse.status !== 200) {
     resp.status(authResponse.status);
     resp.end();
-  } else if (
-    !authResponse.user &&
-    !authResponse.user.roles.includes("admin-user")
-  ) {
+  }
+  if (authResponse.user && !authResponse.user.roles.includes("admin-user")) {
     resp.status(403);
     resp.end();
   } else {
