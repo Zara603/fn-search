@@ -6,6 +6,7 @@ import * as scriptController from "./controllers/scriptController";
 import * as adminController from "./controllers/adminController";
 import * as geoSearchController from "./controllers/geoSearchController";
 import * as popularLocationController from "./controllers/popularLocationController";
+import * as popularDestinationController from "./controllers/popularDestinationController";
 import { authMiddleware, adminMiddleware } from "./middleware/auth";
 
 export default function server(): any {
@@ -23,6 +24,29 @@ export default function server(): any {
 
   // TODO remove this route before going into production.
   app.get("/api/search/flush-all", adminMiddleware, adminController.flushAll);
+
+  app.get(
+    "/api/search/popular-destination",
+    popularDestinationController.index
+  );
+
+  app.post(
+    "/api/search/popular-destination",
+    adminMiddleware,
+    popularDestinationController.create
+  );
+
+  app.patch(
+    "/api/search/popular-destination/:id",
+    adminMiddleware,
+    popularDestinationController.update
+  );
+
+  app.delete(
+    "/api/search/popular-destination/:id",
+    adminMiddleware,
+    popularDestinationController.remove
+  );
 
   app.get("/api/search/popular-location", popularLocationController.index);
 
