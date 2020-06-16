@@ -136,6 +136,12 @@ describe('test locationAlertController', () => {
     const respTwo = await chai.request(app)
       .get('/api/search/location-alert')
     expect(respTwo.status).to.equal(200)
-    expect(respTwo.body.location_alerts[0].available_offers).to.deep.equal([])
+    expect(respTwo.body.location_alerts[0].available_offers).to.deep.equal(
+    {
+      continent: [],
+      country: [],
+      administrative_area_level_1: [],
+      local: []
+    })
   });
 });
