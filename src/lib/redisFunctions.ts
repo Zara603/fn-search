@@ -150,7 +150,7 @@ export function buildAlertObject(flatAlert: any): IAlertObject {
       level: flatAlert.level,
       value: flatAlert.value
     },
-    available_offers: flatAlert.availableOffers
+    available_offers: flatAlert.available_offers
   };
 }
 
@@ -230,7 +230,7 @@ export async function getAllOffersFromKeys(
   });
   const results = await pipeline.exec();
   const nestedResults = results.map(result => result[1]);
-  const flatResults = nestedResults.flat();
+  const flatResults = nestedResults.reduce((acc, val) => acc.concat(val), []);
   const offerKeys = flatResults.map(result => `offer:${result}`);
   const offerIds: any = new Set(offerKeys);
   return await getAllHashes(offerIds);
