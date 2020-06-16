@@ -9,6 +9,7 @@ import * as m from "../src/services/marketingCloud"
 import * as r from "../src/models/redisDestinationAlert"
 import * as auth from "../src/services/auth"
 import { user } from "./fixtures/user"
+import redis from "../src/lib/redis"
 
 const expect = chai.expect
 chai.use(chaiHttp);
@@ -80,15 +81,17 @@ describe('test locationAlertController', () => {
   let redisStub;
 
   beforeEach(async () => {
+    await redis.select(15)
     authStub = sinon.stub(auth, 'getUser');
     authStub.returns(Promise.resolve({status: 200, user}))
   });
 
-  afterEach(function() {
+  afterEach(async () => {
+    await redis.flushdb();
+    await redis.select(0)
     authStub.restore();
     try {
       soapStub.restore();
-      redisStub.restore();
     } catch (err) {
       // sometimes this is not stubbed, dont error if it is not
     }
@@ -96,7 +99,6 @@ describe('test locationAlertController', () => {
 
   it("get locations returns locations alerts", async () => {
     soapStub = sinon.stub(m, 'getUserDestinationAlertsSFMC')
-    redisStub = sinon.stub(r, 'getUserDestinationAlertsRedis')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .get('/api/search/location-alert')
@@ -121,7 +123,6 @@ describe('test locationAlertController', () => {
 
   it("create location creates locationAlert", async () => {
     soapStub = sinon.stub(m, 'createUserDestinationAlertSFMC')
-    redisStub = sinon.stub(r, 'createUserDestinationAlertRedis')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .post("/api/search/location-alert")
@@ -131,5 +132,10 @@ describe('test locationAlertController', () => {
     expect(resp.status).to.equal(201);
     expect(authStub.calledOnce).to.equal(true);
     expect(soapStub.calledOnce).to.equal(true);
+
+    const respTwo = await chai.request(app)
+      .get('/api/search/location-alert')
+    expect(respTwo.status).to.equal(200)
+    expect(respTwo.body.location_alerts[0].available_offers).to.deep.equal([])
   });
 });
