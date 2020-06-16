@@ -78,7 +78,12 @@ export async function getAvailableOffers(alerts: any): Promise<void> {
   const COUNT = process.env.COUNT || 100;
   const pipeline = redis.pipeline();
   alerts.forEach(alt => {
-    alt.available_offers = [];
+    alt.available_offers = {
+      continent: [],
+      country: [],
+      administrative_area_level_1: [],
+      local: []
+    };
     pipeline.zrange(
       `locations:continent:${stringsToKeys(alt.continent)}`,
       0,
