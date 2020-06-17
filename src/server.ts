@@ -36,12 +36,6 @@ export default function server(): any {
     popularDestinationController.create
   );
 
-  app.patch(
-    "/api/search/popular-destination/:id",
-    adminMiddleware,
-    popularDestinationController.update
-  );
-
   app.delete(
     "/api/search/popular-destination/:id",
     adminMiddleware,
@@ -102,12 +96,6 @@ export default function server(): any {
     "/api/search/location-alert",
     authMiddleware,
     locationAlertController.createAlert
-  );
-
-  app.patch(
-    "/api/search/location-alert/:id",
-    authMiddleware,
-    locationAlertController.updateAlert
   );
 
   app.delete(

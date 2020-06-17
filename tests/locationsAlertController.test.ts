@@ -37,12 +37,12 @@ const payload = {
 describe('test locationAlertController Auth', () => {
   let authStub;
 
-  beforeEach(async () => {
+  before(async () => {
     authStub = sinon.stub(auth, 'getUser');
     authStub.returns(Promise.resolve({status: 401, undefined}))
   });
 
-  afterEach(function() {
+  after(function() {
     authStub.restore();
   });
 
@@ -54,14 +54,6 @@ describe('test locationAlertController Auth', () => {
   it("create location requires auth", async () => {
     const resp = await chai.request(app)
       .post("/api/search/location-alert")
-      .set("content-type", "application/json")
-      .send(payload);
-    expect(resp.status).to.equal(401);
-  });
-
-  it("update location requires auth", async () => {
-    const resp = await chai.request(app)
-      .patch("/api/search/location-alert/1")
       .set("content-type", "application/json")
       .send(payload);
     expect(resp.status).to.equal(401);
@@ -113,15 +105,8 @@ describe('test locationAlertController', () => {
     expect(resp.status).to.equal(400);
   });
 
-  it("update location requires correct schema", async () => {
-    const resp = await chai.request(app)
-      .patch("/api/search/location-alert/1")
-      .set("content-type", "application/json")
-      .send({});
-    expect(resp.status).to.equal(400);
-  });
 
-  it("create location creates locationAlert", async () => {
+  it("creates locationAlert", async () => {
     soapStub = sinon.stub(m, 'createUserDestinationAlertSFMC')
     soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)

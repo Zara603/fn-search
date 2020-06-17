@@ -3,14 +3,12 @@ import { logger } from "../lib/logger";
 import {
   getUserDestinationAlertsSFMC,
   createUserDestinationAlertSFMC,
-  updateUserDestinationAlertSFMC,
   deleteUserDestinationAlertSFMC
 } from "../services/marketingCloud";
 
 import {
   getUserDestinationAlertsRedis,
   createUserDestinationAlertRedis,
-  updateUserDestinationAlertRedis,
   deleteUserDestinationAlertRedis
 } from "./redisDestinationAlert";
 import { getContinent } from "../lib/countryToContinent";
@@ -42,23 +40,6 @@ export async function createUserDestinationAlert(
     });
   }
   return await createUserDestinationAlertRedis(locationAlert, user);
-}
-
-export async function updateUserDestinationAlert(
-  locationAlert: IAlertObject,
-  user: IUser
-): Promise<IAlertObject> {
-  locationAlert.google_result.continent = getContinent(locationAlert);
-  try {
-    updateUserDestinationAlertSFMC(locationAlert, user);
-  } catch (err) {
-    logger("error", "Error updating SFMC destination alert", {
-      locationAlert,
-      message: err.message,
-      user
-    });
-  }
-  return await updateUserDestinationAlertRedis(locationAlert, user);
 }
 
 export async function deleteUserDestinationAlert(
