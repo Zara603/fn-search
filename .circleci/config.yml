@@ -7,7 +7,7 @@ jobs:
     environment:
       APP_ENV: spec
       API_BASE_URL: api.testing.luxgroup.com
-      WEBSITE_BASE_URL: testing.luxgroup.com
+      WEBSITE_BASE_URL: luxuryescapes.com
       DATA_EXTENSION_KEY: testing 
       MARKETING_CLOUD_API_CLIENT_ID: testing
       MARKETING_CLOUD_API_CLIENT_SECRET: testing
