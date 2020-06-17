@@ -1,5 +1,5 @@
 import redis from "../lib/redis";
-import { IPopularLocation, IAlertObject, IUser, IUserAlerts } from "../types";
+import { IPopularLocation, IAlertObject, IUserAlerts } from "../types";
 
 const KEY_LIMIT = process.env.KEY_LIMIT || 100;
 const POPULAR_LOCATION_TAG_TYPE =
@@ -159,18 +159,13 @@ export function buildAlertObject(flatAlert: any): IAlertObject {
   };
 }
 
-export function flattenAlertObject(
-  locationAlert: IAlertObject,
-  user?: IUser
-): object {
+export function flattenAlertObject(locationAlert: IAlertObject): object {
   return {
     id: locationAlert.id,
     tag_type: locationAlert.tag_type || "alert",
     tag_value: locationAlert.tag_value || "alert",
     place_id: locationAlert.place_id,
     brand: locationAlert.brand,
-    personContactId: user ? user.personContactId : "",
-    herokuId: user ? user.herokuId : "",
     level: locationAlert.location_alert.level,
     value: locationAlert.location_alert.value,
     lng: locationAlert.location_alert.geocode.lng,
