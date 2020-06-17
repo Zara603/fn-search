@@ -144,7 +144,7 @@ All redis keys currently have a prefix that helps with identifying the object, k
   - locations:holidayType:{holidayType} == key used in sorted set for which offers have a certain holidayType. 
   - locations:country:{country_name} == key used in sorted set for which offers are saved against the country they are found in. 
   - destinationAlerts:{user.UUID} == key used to store a list of destination alert for that user. 
-  - alert:{alert.UUID} == key used to store a hash of a destination alert. 
+  - alert:{alert.place_id} == key used to store a hash of a destination alert. 
   - popularLocations key used to store a set of a popularDestiontions. 
   - popularLocation:{popularDestination.tag} key used to store a set of a location alerts, used to make up a popular destination. 
 

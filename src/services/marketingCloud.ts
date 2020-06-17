@@ -214,13 +214,6 @@ export async function createUserDestinationAlertSFMC(
   await createUpdateRequest(locationAlert, user);
 }
 
-export async function updateUserDestinationAlertSFMC(
-  locationAlert: IAlertObject,
-  user: IUser
-): Promise<void> {
-  await createUpdateRequest(locationAlert, user);
-}
-
 export async function deleteUserDestinationAlertSFMC(
   id: string,
   user: IUser

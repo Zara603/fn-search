@@ -2,7 +2,6 @@ import { IAlertObject } from "../types";
 import {
   getUserDestinationAlertsRedis,
   createUserDestinationAlertRedis,
-  updateUserDestinationAlertRedis,
   deleteUserDestinationAlertRedis
 } from "../models/redisDestinationAlert";
 
@@ -25,15 +24,6 @@ export async function createPopularDestination(
   locationAlert: IAlertObject
 ): Promise<IAlertObject> {
   return createUserDestinationAlertRedis(
-    locationAlert,
-    POPULAR_DESTINATION_USER
-  );
-}
-
-export async function updatePopularDestination(
-  locationAlert: IAlertObject
-): Promise<IAlertObject> {
-  return updateUserDestinationAlertRedis(
     locationAlert,
     POPULAR_DESTINATION_USER
   );

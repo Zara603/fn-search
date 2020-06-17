@@ -24,7 +24,7 @@ export async function createUserDestinationAlertRedis(
 ): Promise<IAlertObject> {
   const key = getKey(user.herokuId, "destinationAlerts");
   try {
-    await redis.sadd(key, getKey(locationAlert.id, "alert"));
+    await redis.sadd(key, getKey(locationAlert.place_id, "alert"));
   } catch (err) {
     logger(
       "error",
@@ -34,10 +34,12 @@ export async function createUserDestinationAlertRedis(
     throw err;
   }
   try {
-    await redis.hmset(
-      getKey(locationAlert.id, "alert"),
-      flattenAlertObject(locationAlert, user)
-    );
+    if (!(await redis.exists(locationAlert.place_id))) {
+      await redis.hmset(
+        getKey(locationAlert.place_id, "alert"),
+        flattenAlertObject(locationAlert)
+      );
+    }
   } catch (err) {
     logger("error", "Error setting user destination alerts list in redis", err);
     throw err;
@@ -45,31 +47,13 @@ export async function createUserDestinationAlertRedis(
   return locationAlert;
 }
 
-export async function updateUserDestinationAlertRedis(
-  locationAlert: IAlertObject,
-  user: IUser
-): Promise<IAlertObject> {
-  try {
-    await redis.hmset(
-      getKey(locationAlert.id, "alert"),
-      flattenAlertObject(locationAlert, user)
-    );
-    return locationAlert;
-  } catch (err) {
-    logger("error", "Error updating destination alert in redis", err);
-    throw err;
-  }
-}
-
 export async function deleteUserDestinationAlertRedis(
-  id: string,
+  place_id: string,
   user: IUser
 ): Promise<void> {
   try {
-    const alertKey = getKey(id, "alert");
-    await redis.del(alertKey);
     const destinationKey = getKey(user.herokuId, "destinationAlerts");
-    return await redis.srem(destinationKey, id);
+    return await redis.srem(destinationKey, getKey(place_id, 'alert'));
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;
