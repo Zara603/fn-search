@@ -53,7 +53,7 @@ export async function deleteUserDestinationAlertRedis(
 ): Promise<void> {
   try {
     const destinationKey = getKey(user.herokuId, "destinationAlerts");
-    return await redis.srem(destinationKey, getKey(place_id, 'alert'));
+    return await redis.srem(destinationKey, getKey(place_id, "alert"));
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;

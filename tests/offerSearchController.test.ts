@@ -8,6 +8,7 @@ import { indexOffers } from "../src/scripts/indexOffers"
 import * as sinon from "sinon"
 import { offers } from "./fixtures/offers"
 import * as offerService from "../src/services/offer"
+import * as snapshot from "snap-shot-it"
 
 const response = [
   {
@@ -48,37 +49,33 @@ describe('test offer location search', () => {
     const resp = await chai.request(app)
       .get("/api/search/offer-search/continent/oceania")
     expect(resp.status).to.equal(200);
-    expect(resp.body).to.deep.equal(response);
+    snapshot(resp.body)
   })
 
   it("get offers by country", async () => {
     const resp = await chai.request(app)
       .get("/api/search/offer-search/country/australia")
     expect(resp.status).to.equal(200);
-    expect(resp.body).to.deep.equal(response);
+    snapshot(resp.body)
   })
 
   it("get offers by admin level one", async () => {
     const resp = await chai.request(app)
       .get("/api/search/offer-search/administrative_area_level_1/New%20South%20Wales")
     expect(resp.status).to.equal(200);
-    expect(resp.body).to.deep.equal(response);
+    snapshot(resp.body)
   })
 
   it("get offers by lat and lng", async () => {
-    const geoResponse = {
-      distance_from_search: "0.0139",
-      ...response[0]
-    }
     const resp = await chai.request(app)
       .get("/api/search/offer-search/geo?lat=-33.8688&lng=151.2092")
     expect(resp.status).to.equal(200);
-    expect(resp.body).to.deep.equal([geoResponse]);
+    snapshot(resp.body)
   })
 
   it("404 offers not found", async () => {
     const resp = await chai.request(app)
-      .get("/api/search/offer-search/administrative_area_level_1/Queensland")
+      .get("/api/search/offer-search/administrative_area_level_1/South%20Australia")
     expect(resp.status).to.equal(404);
     expect(resp.body).to.deep.equal([]);
   })

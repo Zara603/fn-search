@@ -10,9 +10,15 @@ import * as r from "../src/models/redisDestinationAlert"
 import * as auth from "../src/services/auth"
 import { user } from "./fixtures/user"
 import redis from "../src/lib/redis"
+import * as snapshot from "snap-shot-it"
+import { cleanAlertResponse } from "./lib"
+import { indexOffers } from "../src/scripts/indexOffers"
+import * as offerService from "../src/services/offer"
+import { offers } from "./fixtures/offers"
 
 const expect = chai.expect
 chai.use(chaiHttp);
+
 
 const payload = {
   brand: "luxuryescapes",
@@ -28,8 +34,8 @@ const payload = {
     level: "colloquial_area",
     value: "Sydney",
     geocode: {
-      lng: 22.001,
-      lat: 22.001
+      lng: 151.2204,
+      lat: -33.8685
     }
   }
 }
@@ -70,18 +76,22 @@ describe('test locationAlertController Auth', () => {
 describe('test locationAlertController', () => {
   let authStub;
   let soapStub;
-  let redisStub;
+  let getOffersStub; 
 
-  beforeEach(async () => {
-    await redis.select(15)
+  before(async () => {
     authStub = sinon.stub(auth, 'getUser');
     authStub.returns(Promise.resolve({status: 200, user}))
+    getOffersStub = sinon.stub(offerService, 'getOffers')
+    getOffersStub.returns(Promise.resolve(offers))
+    await redis.select(15)
+    await indexOffers()
   });
 
-  afterEach(async () => {
+  after(async () => {
     await redis.flushdb();
     await redis.select(0)
     authStub.restore();
+    getOffersStub.restore()
     try {
       soapStub.restore();
     } catch (err) {
@@ -95,6 +105,7 @@ describe('test locationAlertController', () => {
     const resp = await chai.request(app)
       .get('/api/search/location-alert')
     expect(resp.status).to.equal(200)
+    snapshot(resp.body)
   })
 
   it("create location requires correct schema", async () => {
@@ -115,18 +126,11 @@ describe('test locationAlertController', () => {
       .set('Cookie', 'testing')
       .send(payload);
     expect(resp.status).to.equal(201);
-    expect(authStub.calledOnce).to.equal(true);
-    expect(soapStub.calledOnce).to.equal(true);
 
     const respTwo = await chai.request(app)
       .get('/api/search/location-alert')
     expect(respTwo.status).to.equal(200)
-    expect(respTwo.body.location_alerts[0].available_offers).to.deep.equal(
-    {
-      continent: [],
-      country: [],
-      administrative_area_level_1: [],
-      local: []
-    })
+    cleanAlertResponse(respTwo.body)
+    snapshot(respTwo.body)
   });
 });

@@ -10,6 +10,7 @@
     "lint": "eslint src --ext .js,.ts",
     "lint-fix": "yarn run lint --fix",
     "test": "mocha -r ts-node/register tests/*.test.ts --exit",
+    "update-snaps": "SNAPSHOT_UPDATE=1 mocha -r ts-node/register tests/*.test.ts --exit",
     "test:e2e": "mocha -r ts-node/register tests/e2e/*.test.ts --exit"
   },
   "keywords": [],
@@ -50,6 +51,7 @@
     "prettier": "^1.18.2",
     "sinon": "^9.0.2",
     "sinon-typed": "^0.1.1",
+    "snap-shot-it": "^7.9.3",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
   }
