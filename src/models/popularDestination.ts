@@ -1,16 +1,16 @@
 import { IAlertObject } from "../types";
 import {
-  getUserDestinationAlertsRedis,
-  createUserDestinationAlertRedis,
-  deleteUserDestinationAlertRedis
-} from "../models/redisDestinationAlert";
+  getUserDestinationAlerts,
+  createUserDestinationAlert,
+  deleteUserDestinationAlert
+} from "../models/destinationAlert";
 
 const POPULAR_DESTINATION_USER = {
   herokuId: "popularDestination"
 };
 
 export async function getPopularDestinations(): Promise<IAlertObject[]> {
-  const popularDestinations = await getUserDestinationAlertsRedis(
+  const popularDestinations = await getUserDestinationAlerts(
     POPULAR_DESTINATION_USER
   );
   if (popularDestinations && popularDestinations.location_alerts) {
@@ -23,12 +23,9 @@ export async function getPopularDestinations(): Promise<IAlertObject[]> {
 export async function createPopularDestination(
   locationAlert: IAlertObject
 ): Promise<IAlertObject> {
-  return createUserDestinationAlertRedis(
-    locationAlert,
-    POPULAR_DESTINATION_USER
-  );
+  return createUserDestinationAlert(locationAlert, POPULAR_DESTINATION_USER);
 }
 
 export async function deletePopularDestination(id: string): Promise<void> {
-  return deleteUserDestinationAlertRedis(id, POPULAR_DESTINATION_USER);
+  return deleteUserDestinationAlert(id, POPULAR_DESTINATION_USER);
 }

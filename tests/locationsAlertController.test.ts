@@ -6,7 +6,7 @@ import * as  app from "../src/start"
 import {SinonTyped} from 'sinon-typed';
 import * as sinon from "sinon"
 import * as m from "../src/services/marketingCloud"
-import * as r from "../src/models/redisDestinationAlert"
+import * as r from "../src/models/destinationAlert"
 import * as auth from "../src/services/auth"
 import { user } from "./fixtures/user"
 import redis from "../src/lib/redis"
