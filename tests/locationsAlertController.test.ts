@@ -6,7 +6,7 @@ import * as  app from "../src/start"
 import {SinonTyped} from 'sinon-typed';
 import * as sinon from "sinon"
 import * as m from "../src/services/marketingCloud"
-import * as r from "../src/models/redisDestinationAlert"
+import * as r from "../src/models/destinationAlert"
 import * as auth from "../src/services/auth"
 import { user } from "./fixtures/user"
 import redis from "../src/lib/redis"
@@ -75,7 +75,6 @@ describe('test locationAlertController Auth', () => {
 
 describe('test locationAlertController', () => {
   let authStub;
-  let soapStub;
   let getOffersStub; 
 
   before(async () => {
@@ -92,16 +91,9 @@ describe('test locationAlertController', () => {
     await redis.select(0)
     authStub.restore();
     getOffersStub.restore()
-    try {
-      soapStub.restore();
-    } catch (err) {
-      // sometimes this is not stubbed, dont error if it is not
-    }
   });
 
   it("get locations returns locations alerts", async () => {
-    soapStub = sinon.stub(m, 'getUserDestinationAlertsSFMC')
-    soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .get('/api/search/location-alert')
     expect(resp.status).to.equal(200)
@@ -118,8 +110,6 @@ describe('test locationAlertController', () => {
 
 
   it("creates locationAlert", async () => {
-    soapStub = sinon.stub(m, 'createUserDestinationAlertSFMC')
-    soapStub.returns(Promise.resolve())
     const resp = await chai.request(app)
       .post("/api/search/location-alert")
       .set("content-type", "application/json")

@@ -1,59 +1,61 @@
-import { IUser, IAlertObject } from "../types";
+import redis from "../lib/redis";
 import { logger } from "../lib/logger";
-import {
-  getUserDestinationAlertsSFMC,
-  createUserDestinationAlertSFMC,
-  deleteUserDestinationAlertSFMC
-} from "../services/marketingCloud";
+import { IUser, IAlertObject, IUserAlerts } from "../types";
+import { flattenAlertObject, getAllAlerts } from "../lib/redisFunctions";
 
-import {
-  getUserDestinationAlertsRedis,
-  createUserDestinationAlertRedis,
-  deleteUserDestinationAlertRedis
-} from "./redisDestinationAlert";
-import { getContinent } from "../lib/countryToContinent";
+function getKey(value: any, keyType: string): string {
+  return `${keyType}:${value}`;
+}
 
 export async function getUserDestinationAlerts(
   user: IUser
-): Promise<IAlertObject[]> {
-  let results;
-  results = await getUserDestinationAlertsRedis(user);
-  if (!results) {
-    results = await getUserDestinationAlertsSFMC(user);
+): Promise<void | IUserAlerts> {
+  const key = getKey(user.herokuId, "destinationAlerts");
+  const alertIds = await redis.smembers(key);
+  if (!alertIds) {
+    return;
   }
-  return results;
+  return await getAllAlerts(alertIds);
 }
 
 export async function createUserDestinationAlert(
   locationAlert: IAlertObject,
   user: IUser
 ): Promise<IAlertObject> {
-  locationAlert.google_result.continent = getContinent(locationAlert);
-  locationAlert.created_at = new Date().toISOString();
+  const key = getKey(user.herokuId, "destinationAlerts");
   try {
-    createUserDestinationAlertSFMC(locationAlert, user);
+    await redis.sadd(key, getKey(locationAlert.place_id, "alert"));
   } catch (err) {
-    logger("error", "Error creating SFMC destination alert", {
-      locationAlert,
-      message: err.message,
-      user
-    });
+    logger(
+      "error",
+      "Error adding to user destination alerts list in redis",
+      err
+    );
+    throw err;
   }
-  return await createUserDestinationAlertRedis(locationAlert, user);
+  try {
+    if (!(await redis.exists(locationAlert.place_id))) {
+      await redis.hmset(
+        getKey(locationAlert.place_id, "alert"),
+        flattenAlertObject(locationAlert)
+      );
+    }
+  } catch (err) {
+    logger("error", "Error setting user destination alerts list in redis", err);
+    throw err;
+  }
+  return locationAlert;
 }
 
 export async function deleteUserDestinationAlert(
-  id: string,
+  place_id: string,
   user: IUser
 ): Promise<void> {
   try {
-    deleteUserDestinationAlertSFMC(id, user);
+    const destinationKey = getKey(user.herokuId, "destinationAlerts");
+    return await redis.srem(destinationKey, getKey(place_id, "alert"));
   } catch (err) {
-    logger("error", "Error deleting SFMC destination alert", {
-      alertId: id,
-      message: err.message,
-      user
-    });
+    logger("error", "Error deleting destination alert in redis", err);
+    throw err;
   }
-  return await deleteUserDestinationAlertRedis(id, user);
 }
