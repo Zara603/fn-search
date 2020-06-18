@@ -2,6 +2,11 @@ import redis from "../lib/redis";
 import { logger } from "../lib/logger";
 import { IUser, IAlertObject, IUserAlerts } from "../types";
 import { flattenAlertObject, getAllAlerts } from "../lib/redisFunctions";
+import {
+  CREATE_USER_DESTINATION_SET,
+  DELETE_USER_DESTINATION_SET,
+  CREATE_DESTINATION_SET
+} from "../config";
 
 function getKey(value: any, keyType: string): string {
   return `${keyType}:${value}`;
@@ -25,6 +30,10 @@ export async function createUserDestinationAlert(
   const key = getKey(user.herokuId, "destinationAlerts");
   try {
     await redis.sadd(key, getKey(locationAlert.place_id, "alert"));
+    await redis.sadd(
+      CREATE_USER_DESTINATION_SET,
+      `${user.herokuId}:${user.personContactId}:${locationAlert.place_id}`
+    );
   } catch (err) {
     logger(
       "error",
@@ -38,6 +47,10 @@ export async function createUserDestinationAlert(
       await redis.hmset(
         getKey(locationAlert.place_id, "alert"),
         flattenAlertObject(locationAlert)
+      );
+      await redis.sadd(
+        CREATE_DESTINATION_SET,
+        getKey(locationAlert.place_id, "alert")
       );
     }
   } catch (err) {
@@ -53,6 +66,10 @@ export async function deleteUserDestinationAlert(
 ): Promise<void> {
   try {
     const destinationKey = getKey(user.herokuId, "destinationAlerts");
+    await redis.sadd(
+      DELETE_USER_DESTINATION_SET,
+      `${user.herokuId}:${user.personContactId}:${place_id}`
+    );
     return await redis.srem(destinationKey, getKey(place_id, "alert"));
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
