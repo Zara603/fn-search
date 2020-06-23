@@ -39,6 +39,7 @@ export interface IAlertObject {
 export interface IPopularLocation {
   id?: string;
   tag: string;
+  image_id: string;
   location_alerts: IAlertObject[];
 }
 
