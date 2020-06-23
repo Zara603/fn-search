@@ -25,6 +25,7 @@ export async function getPopularLocation(
 ): Promise<IPopularLocation> {
   const locationAlertKeys = await redis.smembers(popularLocationTag);
   const allHashes = await getAllHashes(locationAlertKeys);
+  const imageId = await redis.get(`${popularLocationTag}:image`)
   const locationAlerts: IAlertObject[] = [];
 
   for (let i = 0; i < allHashes.length; i++) {
@@ -34,6 +35,7 @@ export async function getPopularLocation(
 
   return {
     tag: cleanTag(popularLocationTag),
+    image_id: imageId,
     location_alerts: locationAlerts
   };
 }
@@ -54,6 +56,7 @@ export async function createPopularLocation(
   await deletePopularLocation(popularLocation.tag);
   const locationAlertKeys: string[] = [];
   const pipeline = redis.pipeline();
+  pipeline.set(`${getPopularLocationKey(popularLocation.tag)}:image`, popularLocation.image_id)
   popularLocation.location_alerts.forEach(locationAlert => {
     locationAlert.id = uuidv4();
     const key = `popularLocationAlert:${locationAlert.id}`;

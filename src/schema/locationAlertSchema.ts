@@ -28,6 +28,7 @@ const locationAlertSchema = {
 
 const popularLocationsSchema = {
   tag: s.string(),
+  image_id: s.string(),
   location_alerts: s.array({ of: locationAlertSchema })
 };
 
