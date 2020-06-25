@@ -71,7 +71,18 @@ $ curl -X DELETE  -H 'Cookie:access_token='"$ACCESS_TOKEN"''  https://${API_BASE
 
 ## Searching for offers
 
-Offers can be searched using the following URL 
+Offers can be searched using the following methods 
+
+### Get a list of offers using a Google place_id
+
+```
+https://${API_BASE_URI}/api/search/destination/${place_id}
+```
+
+will return a destination and all the relevant available offers, if nothing is found 404 and empty object.
+
+### Seach using address level and value.
+
 
 ```
 https://${API_BASE_URI}/api/search/offer-search/${level}/${value}
