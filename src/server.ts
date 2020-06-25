@@ -14,6 +14,11 @@ export default function server(): any {
   app.use(bodyParserJson());
 
   app.get(
+    "/api/search/destination/:placeId",
+    offerSearchController.getOffersByPlaceId
+  );
+
+  app.get(
     "/api/search/offer-search/:level/:value",
     offerSearchController.getOffers
   );

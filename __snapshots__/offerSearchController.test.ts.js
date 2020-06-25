@@ -167,3 +167,49 @@ exports['test offer location search get offers by continent 1'] = [
     "url": "https://luxuryescapes.com/Surfers-Paridise/testing003"
   }
 ]
+
+exports['test offer location search get offers by placeId 1'] = {
+  "id": "testing",
+  "tag_type": "alert",
+  "tag_value": "alert",
+  "place_id": "testing",
+  "created_at": "",
+  "brand": "luxuryescapes",
+  "google_result": {
+    "administrative_area_level_1": "New South Wales",
+    "colloquial_area": "Sydney",
+    "locality": "",
+    "continent": "Oceania",
+    "country": "Australia"
+  },
+  "location_alert": {
+    "geocode": {
+      "lat": -33.8685,
+      "lng": 151.2204
+    },
+    "level": "colloquial_area",
+    "value": "Sydney"
+  },
+  "available_offers": {
+    "continent": [
+      "testing001",
+      "testing002",
+      "testing004",
+      "testing003"
+    ],
+    "country": [
+      "testing001",
+      "testing002",
+      "testing004",
+      "testing003"
+    ],
+    "administrative_area_level_1": [
+      "testing001",
+      "testing002"
+    ],
+    "local": [
+      "testing002",
+      "testing001"
+    ]
+  }
+}

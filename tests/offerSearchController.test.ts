@@ -4,6 +4,7 @@ import server from "../src/server"
 import chaiHttp = require('chai-http');
 import * as  app from "../src/start"
 import redis from "../src/lib/redis"
+import { getKey } from "../src/lib/redisFunctions"
 import { indexOffers } from "../src/scripts/indexOffers"
 import * as sinon from "sinon"
 import { offers } from "./fixtures/offers"
@@ -31,6 +32,24 @@ chai.use(chaiHttp);
 
 describe('test offer location search', () => {
   let getOffersStub; 
+  const place_id = 'testing'
+  const destination = {
+    place_id,
+    id: place_id,
+    tag_type: 'alert',
+    tag_value: 'alert',
+    brand: 'luxuryescapes',
+    level: 'colloquial_area',
+    value: 'Sydney',
+    lng: 151.2204,
+    lat: -33.8685,
+    continent: 'Oceania',
+    country: 'Australia',
+    administrative_area_level_1: 'New South Wales',
+    colloquial_area: 'Sydney',
+    locality: '',
+    created_at: ''
+  }
 
   before(async () => {
     getOffersStub = sinon.stub(offerService, 'getOffers')
@@ -44,6 +63,21 @@ describe('test offer location search', () => {
     await redis.select(0)
     getOffersStub.restore()
   });
+
+  it("get offers by placeId 404 nothing found", async () => {
+    const resp = await chai.request(app)
+      .get("/api/search/destination/testing")
+    expect(resp.status).to.equal(404);
+    expect(resp.body).to.deep.equal({})
+  })
+
+  it("get offers by placeId", async () => {
+    await redis.hmset(getKey(place_id, 'alert'), destination)
+    const resp = await chai.request(app)
+      .get("/api/search/destination/testing")
+    expect(resp.status).to.equal(200);
+    snapshot(resp.body)
+  })
 
   it("get offers by continent", async () => {
     const resp = await chai.request(app)
