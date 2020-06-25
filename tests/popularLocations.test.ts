@@ -6,6 +6,8 @@ import redis from "../src/lib/redis"
 import * as auth from "../src/services/auth"
 import * as sinon from "sinon"
 import { adminUser } from "./fixtures/user"
+import { offers } from "./fixtures/offers"
+import * as offerService from "../src/services/offer"
 import * as snapshot from "snap-shot-it"
 import { indexOffers } from "../src/scripts/indexOffers"
 
@@ -78,8 +80,9 @@ const newLocationAlert = {
 }
 
 
-describe('test e2e Popular Locations', () => {
+describe('test Popular Locations', () => {
   let authStub;
+  let getOffersStub;
 
   before(async () => {
     // using database 15 as test database
@@ -87,6 +90,8 @@ describe('test e2e Popular Locations', () => {
     // intension of these tests is not to test auth
     authStub = sinon.stub(auth, 'getUser');
     authStub.returns(Promise.resolve({status: 200, user: adminUser}))
+    getOffersStub = sinon.stub(offerService, 'getOffers')
+    getOffersStub.returns(Promise.resolve(offers))
     await indexOffers()
   });
 
