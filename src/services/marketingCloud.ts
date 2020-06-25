@@ -1,4 +1,5 @@
 import * as FuelSoap from "fuel-soap";
+import * as FuelRest from "fuel-rest";
 import { v4 as uuidv4 } from "uuid";
 import { logger } from "../lib/logger";
 import {
@@ -11,13 +12,35 @@ import {
 
 const SoapClient = new FuelSoap({
   auth: {
-    clientId: process.env.MARKETING_CLOUD_API_CLIENT_ID || "invalid-client-id",
-    clientSecret:
-      process.env.MARKETING_CLOUD_API_CLIENT_SECRET || "invalid-client-secret"
+    clientId: process.env.MARKETING_CLOUD_API_CLIENT_ID,
+    clientSecret: process.env.MARKETING_CLOUD_API_CLIENT_SECRET
   },
   soapEndpoint:
     "https://mckkfx4222l3xk300nzdmzdg55cq.soap.marketingcloudapis.com/Service.asmx"
 });
+
+const RestClient = new FuelRest({
+  auth: {
+    clientId: process.env.MARKETING_CLOUD_API_CLIENT_ID,
+    clientSecret: process.env.MARKETING_CLOUD_API_CLIENT_SECRET
+  },
+  origin: "https://mckkfx4222l3xk300nzdmzdg55cq.rest.marketingcloudapis.com"
+});
+
+export async function upsertDataExtensionAsyncByKey(
+  externalKey: string,
+  items: object[]
+): Promise<void> {
+  const body = JSON.stringify({ items });
+  const response = await RestClient.put({
+    uri: `data/v1/async/dataextensions/key:${externalKey}/rows`,
+    body
+  });
+  if (response.res.statusCode !== 202) {
+    throw new Error(JSON.stringify(response.body));
+  }
+  return response.body;
+}
 
 async function getRequest(
   dataObjectName: string,

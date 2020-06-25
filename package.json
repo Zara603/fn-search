@@ -5,11 +5,11 @@
   "main": "dist/index.js",
   "scripts": {
     "start": "node dist/start.js",
-    "dev": "nodemon src/start.ts",
+    "dev": "nodemon -r dotenv-safe/config src/start.ts",
     "build": "rm -rf dist && tsc",
     "lint": "eslint src --ext .js,.ts",
     "lint-fix": "yarn run lint --fix",
-    "test": "mocha -r ts-node/register tests/*.test.ts --exit",
+    "test": "mocha -r ts-node/register tests/*.test.ts --timeout 3000 --exit -r dotenv-safe/config",
     "update-snaps": "SNAPSHOT_UPDATE=1 mocha -r ts-node/register tests/*.test.ts --exit",
     "test:e2e": "mocha -r ts-node/register tests/e2e/*.test.ts --exit"
   },
@@ -22,6 +22,7 @@
     "@types/node-fetch": "^2.3.4",
     "body-parser": "^1.19.0",
     "express": "^4.17.1",
+    "fuel-rest": "^3.2.2",
     "fuel-soap": "^2.2.4",
     "ioredis": "^4.14.1",
     "node-fetch": "^2.6.0",
