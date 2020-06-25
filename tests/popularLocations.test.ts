@@ -1,31 +1,34 @@
 import * as chai from "chai"
-import server from "../../src/server"
+import server from "../src/server"
 import chaiHttp = require('chai-http');
-import * as  app from "../../src/start"
-import redis from "../../src/lib/redis"
-import * as auth from "../../src/services/auth"
+import * as  app from "../src/start"
+import redis from "../src/lib/redis"
+import * as auth from "../src/services/auth"
 import * as sinon from "sinon"
-import { user } from "../fixtures/user"
+import { adminUser } from "./fixtures/user"
+import * as snapshot from "snap-shot-it"
+import { indexOffers } from "../src/scripts/indexOffers"
 
 const expect = chai.expect
 chai.use(chaiHttp);
 
 const payload = {
   tag: "NZ & The Pacific",
+  image_id: "testing",
   location_alerts: [
   {
     brand: "luxuryescapes",
     place_id: "baa baa",
     google_result:{
       continent: "Oceania",
-      country: "New Zealand",
+      country: "Australia",
       administrative_area_level_1: "",
       locality: "",
       colloquial_area: ""
     },
     location_alert: {
       level: "country",
-      value: "New Zealand",
+      value: "Australia",
       geocode: {
         lng: 22.001,
         lat: 22.001
@@ -37,14 +40,14 @@ const payload = {
     place_id: "the islands",
     google_result:{
       continent: "Oceania",
-      country: "Fiji",
+      country: "New Zealand",
       administrative_area_level_1: "",
       locality: "",
       colloquial_area: ""
     },
     location_alert: {
       level: "country",
-      value: "Fiji",
+      value: "New Zealand",
       geocode: {
         lng: 23.001,
         lat: 23.001
@@ -75,7 +78,7 @@ const newLocationAlert = {
 }
 
 
-describe('test Popular Locations', () => {
+describe('test e2e Popular Locations', () => {
   let authStub;
 
   before(async () => {
@@ -83,7 +86,8 @@ describe('test Popular Locations', () => {
     await redis.select(15)
     // intension of these tests is not to test auth
     authStub = sinon.stub(auth, 'getUser');
-    authStub.returns(Promise.resolve({status: 200, user}))
+    authStub.returns(Promise.resolve({status: 200, user: adminUser}))
+    await indexOffers()
   });
 
   after(async() => {
@@ -100,7 +104,7 @@ describe('test Popular Locations', () => {
     expect(resp.body).to.deep.equal([]);
   });
 
-  it.only("create popular locations", async () => {
+  it("create popular locations", async () => {
     const respOne = await chai.request(app)
       .post("/api/search/popular-location")
       .set("content-type", "application/json")
@@ -110,8 +114,7 @@ describe('test Popular Locations', () => {
     const respTwo = await chai.request(app)
       .get("/api/search/popular-location")
     expect(respTwo.status).to.equal(200);
-    expect(respTwo.body[0].tag).to.equal(payload.tag);
-    expect(respTwo.body[0].location_alerts.length).to.equal(payload.location_alerts.length);
+    snapshot(respTwo.body)
   });
 
   it("update popular location", async () => {
@@ -127,8 +130,7 @@ describe('test Popular Locations', () => {
     const respTwo = await chai.request(app)
       .get("/api/search/popular-location")
     expect(respTwo.status).to.equal(200);
-    expect(respTwo.body[0].tag).to.equal(payload.tag);
-    expect(respTwo.body[0].location_alerts.length).to.equal(payload.location_alerts.length);
+    snapshot(respTwo.body)
   });
 
   it("add popular location", async () => {
@@ -137,7 +139,7 @@ describe('test Popular Locations', () => {
       .set("content-type", "application/json")
       .send({tag: payload.tag});
     expect(respOne.status).to.equal(201);
-    expect(respOne.body).to.equal("tag: NZ & The Pacific added to users alerts")
+    snapshot(respOne.body)
   })
 
   it("delete popular location", async () => {
@@ -154,7 +156,7 @@ describe('test Popular Locations', () => {
     const respTwo = await chai.request(app)
       .get("/api/search/location-alert")
     expect(respTwo.status).to.equal(200);
-    expect(respTwo.body).to.deep.equal({location_alerts:[], popular_locations:[]});
+    snapshot(respTwo.body)
   });
 
 });

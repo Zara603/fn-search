@@ -22,6 +22,7 @@ export async function create(
   res: Response
 ): Promise<Response | void> {
   const errors = schemas.popularLocationsSchema.match(req.body);
+  console.log("whats the issue");
   if (errors.length) {
     res.status(400);
     res.json({ errors });

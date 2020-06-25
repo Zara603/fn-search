@@ -1,9 +1,15 @@
-import { IPopularLocation, IUser, IAlertObject } from "../types";
+import {
+  IPopularLocation,
+  IUser,
+  IAlertObject,
+  IPopularLocationResponse
+} from "../types";
 import redis from "../lib/redis";
 import { v4 as uuidv4 } from "uuid";
 import {
   flattenAlertObject,
   getAllHashes,
+  getAllAlerts,
   getKey,
   buildAlertObject
 } from "../lib/redisFunctions";
@@ -20,7 +26,7 @@ function cleanTag(tag: string): string {
   return tag.replace("popularLocation:", "");
 }
 
-export async function getPopularLocation(
+async function getFullPopularLocation(
   popularLocationTag: string
 ): Promise<IPopularLocation> {
   const locationAlertKeys = await redis.smembers(popularLocationTag);
@@ -40,8 +46,45 @@ export async function getPopularLocation(
   };
 }
 
-export async function getPopularLocations(): Promise<IPopularLocation[]> {
-  const popularLocations: IPopularLocation[] = [];
+export async function getPopularLocation(
+  popularLocationTag: string
+): Promise<IPopularLocationResponse> {
+  const locationAlertKeys = await redis.smembers(popularLocationTag);
+  const allLocations = await getAllAlerts(locationAlertKeys);
+  const imageId = await redis.get(`${popularLocationTag}:image`);
+  const availableOfferSet = new Set();
+  allLocations.location_alerts.forEach(alt => {
+    if (alt.available_offers) {
+      alt.available_offers.continent.reduce(
+        (offerSet, offerId) => offerSet.add(offerId),
+        availableOfferSet
+      );
+      alt.available_offers.country.reduce(
+        (offerSet, offerId) => offerSet.add(offerId),
+        availableOfferSet
+      );
+      alt.available_offers.administrative_area_level_1.reduce(
+        (offerSet, offerId) => offerSet.add(offerId),
+        availableOfferSet
+      );
+      alt.available_offers.local.reduce(
+        (offerSet, offerId) => offerSet.add(offerId),
+        availableOfferSet
+      );
+    }
+  });
+
+  return {
+    tag: cleanTag(popularLocationTag),
+    image_id: imageId,
+    available_offers: Array.from(availableOfferSet)
+  };
+}
+
+export async function getPopularLocations(): Promise<
+  IPopularLocationResponse[]
+> {
+  const popularLocations: IPopularLocationResponse[] = [];
   const popularLocationKeys = await redis.smembers(POPULAR_LOCATIONS_KEY);
   for (let i = 0; i < popularLocationKeys.length; i++) {
     const key = popularLocationKeys[i];
@@ -97,7 +140,9 @@ export async function addPopularLocation(
   user: IUser
 ): Promise<string> {
   const popularLocationsTag = getPopularLocationKey(tag);
-  const popularLocationAlerts = await getPopularLocation(popularLocationsTag);
+  const popularLocationAlerts = await getFullPopularLocation(
+    popularLocationsTag
+  );
   const userAlertsSetKey = getKey(user.herokuId, "destinationAlerts");
   for (let i = 0; i < popularLocationAlerts.location_alerts.length; i++) {
     const newAlert = popularLocationAlerts.location_alerts[i];
