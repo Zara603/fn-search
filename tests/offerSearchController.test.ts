@@ -72,7 +72,7 @@ describe('test offer location search', () => {
   })
 
   it("get offers by placeId", async () => {
-    await redis.hmset(getKey(place_id, 'alert'), destination)
+    await redis.hmset(getKey(place_id, 'destination'), destination)
     const resp = await chai.request(app)
       .get("/api/search/destination/testing")
     expect(resp.status).to.equal(200);

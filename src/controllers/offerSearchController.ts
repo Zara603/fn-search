@@ -3,7 +3,7 @@ import {
   stringsToKeys,
   getAllOffersFromKeys,
   getKey,
-  getAllAlerts
+  getDestinations
 } from "../lib/redisFunctions";
 
 export async function getOffers(
@@ -26,8 +26,8 @@ export async function getOffersByPlaceId(
   res: Response
 ): Promise<Response | void> {
   const placeId: any = req.params.placeId;
-  const key = getKey(placeId, "alert");
-  const results = await getAllAlerts([key]);
+  const key = getKey(placeId, "destination");
+  const results = await getDestinations([key]);
   if (!results || results.location_alerts.length !== 1) {
     res.status(404);
     return res.json({});

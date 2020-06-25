@@ -27,7 +27,11 @@ export default function server(): any {
 
   app.get("/api/search/index-offers", adminMiddleware, scriptController.index);
 
-  app.get("/api/search/update-sfmc", adminMiddleware, scriptController.sendDataToSFMC);
+  app.get(
+    "/api/search/update-sfmc",
+    adminMiddleware,
+    scriptController.sendDataToSFMC
+  );
 
   // TODO remove this route before going into production.
   app.get("/api/search/flush-all", adminMiddleware, adminController.flushAll);

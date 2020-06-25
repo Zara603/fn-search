@@ -1,7 +1,7 @@
 import redis from "../lib/redis";
 import { logger } from "../lib/logger";
 import { IUser, IAlertObject, IUserAlerts } from "../types";
-import { flattenAlertObject, getAllAlerts } from "../lib/redisFunctions";
+import { flattenAlertObject, getDestinations } from "../lib/redisFunctions";
 import {
   CREATE_USER_DESTINATION_SET,
   DELETE_USER_DESTINATION_SET,
@@ -20,7 +20,7 @@ export async function getUserDestinationAlerts(
   if (!alertIds) {
     return;
   }
-  return await getAllAlerts(alertIds);
+  return await getDestinations(alertIds);
 }
 
 export async function createUserDestinationAlert(
@@ -29,7 +29,7 @@ export async function createUserDestinationAlert(
 ): Promise<IAlertObject> {
   const key = getKey(user.herokuId, "destinationAlerts");
   try {
-    await redis.sadd(key, getKey(locationAlert.place_id, "alert"));
+    await redis.sadd(key, getKey(locationAlert.place_id, "destination"));
     await redis.sadd(
       CREATE_USER_DESTINATION_SET,
       `${user.herokuId}:${user.personContactId}:${locationAlert.place_id}`
@@ -45,12 +45,12 @@ export async function createUserDestinationAlert(
   try {
     if (!(await redis.exists(locationAlert.place_id))) {
       await redis.hmset(
-        getKey(locationAlert.place_id, "alert"),
+        getKey(locationAlert.place_id, "destination"),
         flattenAlertObject(locationAlert)
       );
       await redis.sadd(
         CREATE_DESTINATION_SET,
-        getKey(locationAlert.place_id, "alert")
+        getKey(locationAlert.place_id, "destination")
       );
     }
   } catch (err) {
@@ -70,7 +70,7 @@ export async function deleteUserDestinationAlert(
       DELETE_USER_DESTINATION_SET,
       `${user.herokuId}:${user.personContactId}:${place_id}`
     );
-    return await redis.srem(destinationKey, getKey(place_id, "alert"));
+    return await redis.srem(destinationKey, getKey(place_id, "destination"));
   } catch (err) {
     logger("error", "Error deleting destination alert in redis", err);
     throw err;

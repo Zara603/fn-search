@@ -189,7 +189,7 @@ export async function getAllHashes(keys: string[]): Promise<any[]> {
   return results.map(result => result[1]);
 }
 
-export async function getAllAlerts(keys: string[]): Promise<IUserAlerts> {
+export async function getDestinations(keys: string[]): Promise<IUserAlerts> {
   // trip two to redis
   const allAlerts = await getAllHashes(keys);
   // trip three to redis
