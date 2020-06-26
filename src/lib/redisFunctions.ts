@@ -1,4 +1,5 @@
 import redis from "../lib/redis";
+import { getContinentFromCountry } from "../lib/countryToContinent";
 import { IPopularLocation, IAlertObject, IUserAlerts } from "../types";
 
 const KEY_LIMIT = process.env.KEY_LIMIT || 100;
@@ -170,13 +171,13 @@ export function flattenAlertObject(locationAlert: IAlertObject): object {
     value: locationAlert.location_alert.value,
     lng: locationAlert.location_alert.geocode.lng,
     lat: locationAlert.location_alert.geocode.lat,
-    continent: locationAlert.google_result.continent,
+    continent: getContinentFromCountry(locationAlert.google_result.country),
     country: locationAlert.google_result.country,
     administrative_area_level_1:
       locationAlert.google_result.administrative_area_level_1,
     colloquial_area: locationAlert.google_result.colloquial_area,
     locality: locationAlert.google_result.locality,
-    created_at: locationAlert.created_at
+    created_at: locationAlert.created_at || new Date().toISOString()
   };
 }
 

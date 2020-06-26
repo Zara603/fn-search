@@ -24,7 +24,7 @@ const payload = {
   brand: "luxuryescapes",
   place_id: "testing",
   google_result:{
-    continent: "Oceania",
+    continent: "",
     country: "Australia",
     administrative_area_level_1: "New South Wales",
     locality: "",
