@@ -67,7 +67,7 @@ export async function addPopularTag(
   }
   await addPopularLocation(req.body.tag, req.user);
   res.status(201);
-  return res.json(`tag: ${req.body.tag} added to users alerts`);
+  return res.json(req.body);
 }
 
 export async function removePopularTag(
