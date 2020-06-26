@@ -36,6 +36,12 @@ export interface IAlertObject {
   brand: string;
 }
 
+export interface IPopularLocationResponse {
+  tag: string;
+  image_id: string;
+  available_offers: any[];
+}
+
 export interface IPopularLocation {
   id?: string;
   tag: string;
