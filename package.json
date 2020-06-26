@@ -9,6 +9,7 @@
     "build": "rm -rf dist && tsc",
     "lint": "eslint src --ext .js,.ts",
     "lint-fix": "yarn run lint --fix",
+    "backUpFromSFMC": "node -e 'require(\"./dist/scripts/sfmcBackUp\")'",
     "test": "mocha -r ts-node/register tests/*.test.ts --timeout 3000 --exit -r dotenv-safe/config",
     "update-snaps": "SNAPSHOT_UPDATE=1 mocha -r ts-node/register tests/*.test.ts --exit",
     "test:e2e": "mocha -r ts-node/register tests/e2e/*.test.ts --exit"
